@@ -300,7 +300,7 @@
                 // Save immediately
                 const firm = DataManager.getFirmProfile();
                 firm.logo = base64;
-                DataManager.saveFirmProfile(firm);
+                DataManager.setFirmProfile(firm);
 
                 // Update sidebar
                 document.getElementById('sidebar-logo').src = base64;
@@ -318,7 +318,7 @@
 
             const firm = DataManager.getFirmProfile();
             firm.logo = defaultLogo;
-            DataManager.saveFirmProfile(firm);
+            DataManager.setFirmProfile(firm);
             document.getElementById('sidebar-logo').src = defaultLogo;
 
             Utils.showToast('Logo direset ke default', 'success');
@@ -347,7 +347,7 @@
             firm.invoiceDueDays = parseInt(document.getElementById('invoice-due-days').value) || 30;
             firm.invoiceTerms = document.getElementById('invoice-terms').value.trim();
 
-            DataManager.saveFirmProfile(firm);
+            DataManager.setFirmProfile(firm);
 
             // Update sidebar
             document.getElementById('sidebar-firm-name').textContent = firm.firmName;
