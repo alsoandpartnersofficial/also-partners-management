@@ -47,6 +47,20 @@ const DataManager = {
         }
     },
 
+    // Session Management
+    getCurrentUser() {
+        const data = localStorage.getItem(this.KEYS.CURRENT_USER);
+        return data ? JSON.parse(data) : null;
+    },
+
+    setCurrentUser(user) {
+        if (user) {
+            localStorage.setItem(this.KEYS.CURRENT_USER, JSON.stringify(user));
+        } else {
+            localStorage.removeItem(this.KEYS.CURRENT_USER);
+        }
+    },
+
     // ==================== FIRM PROFILE ====================
     getDefaultFirmProfile() {
         return {

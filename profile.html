@@ -370,7 +370,7 @@
 
                     // Update session
                     const updatedUser = DataManager.getUserById(user.id);
-                    DataManager.saveCurrentUser(updatedUser);
+                    DataManager.setCurrentUser(updatedUser);
 
                     Utils.showToast('Foto profil berhasil diperbarui', 'success');
 
@@ -398,7 +398,7 @@
 
             // Update session
             const updatedUser = DataManager.getUserById(user.id);
-            DataManager.saveCurrentUser(updatedUser);
+            DataManager.setCurrentUser(updatedUser);
 
             Utils.showToast('Profil berhasil diperbarui', 'success');
 
@@ -438,7 +438,7 @@
 
             // Update session
             const updatedUser = DataManager.getUserById(user.id);
-            DataManager.saveCurrentUser(updatedUser);
+            DataManager.setCurrentUser(updatedUser);
 
             Utils.showToast('Password berhasil diubah', 'success');
 
