@@ -361,7 +361,8 @@
                 }
 
                 try {
-                    const base64 = await Utils.fileToBase64(file);
+                    // Compress image to max 300px width, 0.7 quality to save space
+                    const base64 = await Utils.compressImage(file, 300, 0.7);
                     const user = Auth.getCurrentUser();
 
                     // Update user data

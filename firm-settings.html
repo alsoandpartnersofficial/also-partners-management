@@ -294,7 +294,7 @@
             }
 
             try {
-                const base64 = await Utils.fileToBase64(file);
+                const base64 = await Utils.compressImage(file, 200, 0.7);
                 document.getElementById('current-logo').src = base64;
 
                 // Save immediately
