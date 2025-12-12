@@ -399,6 +399,22 @@ const Utils = {
         date.setHours(0, 0, 0, 0);
         const diffTime = date - today;
         return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    },
+
+    // Set user avatar to element
+    setAvatar(elementId, user) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+
+        if (user && user.avatar) {
+            element.innerHTML = `<img src="${user.avatar}" alt="${user.fullName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            element.style.background = 'transparent';
+            element.textContent = '';
+        } else {
+            element.innerHTML = '';
+            element.textContent = this.getInitials(user ? user.fullName : '?');
+            element.style.background = this.stringToColor(user ? user.fullName : '?');
+        }
     }
 };
 

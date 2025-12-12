@@ -62,8 +62,18 @@
                     <div>
                         <div class="card">
                             <div class="card-body text-center">
-                                <div id="profile-avatar" class="user-avatar avatar-xl mx-auto mb-lg"
-                                    style="width: 120px; height: 120px; font-size: 2.5rem;"></div>
+                                <div class="position-relative mx-auto mb-lg" style="width: 120px; height: 120px;">
+                                    <div id="profile-avatar" class="user-avatar avatar-xl w-100 h-100"
+                                        style="font-size: 2.5rem; overflow: hidden;">
+                                        <!-- Image or Initials will be here -->
+                                    </div>
+                                    <label for="avatar-input" class="position-absolute"
+                                        style="bottom: 0; right: 0; background: var(--primary-navy); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                                        <i class="fas fa-camera" style="font-size: 0.875rem;"></i>
+                                    </label>
+                                    <input type="file" id="avatar-input" accept="image/*" style="display: none;"
+                                        onchange="handleAvatarUpload(this)">
+                                </div>
                                 <h2 id="profile-name" style="font-family: var(--font-heading); margin-bottom: 0.25rem;">
                                 </h2>
                                 <p id="profile-role" class="text-secondary mb-lg"></p>
@@ -302,8 +312,10 @@
 
             document.getElementById('sidebar-logo').src = firm.logo;
             document.getElementById('sidebar-firm-name').textContent = firm.firmName;
-            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
-            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+
+            // Header Avatar
+            Utils.setAvatar('header-avatar', user);
+
             document.getElementById('header-user-name').textContent = user.fullName;
             document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
         }
@@ -312,9 +324,7 @@
             const user = Auth.getCurrentUser();
 
             // Profile card
-            const avatar = document.getElementById('profile-avatar');
-            avatar.textContent = Utils.getInitials(user.fullName);
-            avatar.style.background = Utils.stringToColor(user.fullName);
+            Utils.setAvatar('profile-avatar', user);
 
             document.getElementById('profile-name').textContent = user.fullName;
             document.getElementById('profile-role').textContent = Auth.getRoleLabel(user.role);
@@ -338,6 +348,39 @@
             document.getElementById('edit-username').value = user.username;
             document.getElementById('edit-email').value = user.email;
             document.getElementById('edit-phone').value = user.phone || '';
+        }
+
+        async function handleAvatarUpload(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+
+                // Validate size (max 2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    Utils.showToast('Ukuran file maksimal 2MB', 'error');
+                    return;
+                }
+
+                try {
+                    const base64 = await Utils.fileToBase64(file);
+                    const user = Auth.getCurrentUser();
+
+                    // Update user data
+                    DataManager.updateUser(user.id, { avatar: base64 });
+
+                    // Update session
+                    const updatedUser = DataManager.getUserById(user.id);
+                    DataManager.saveCurrentUser(updatedUser);
+
+                    Utils.showToast('Foto profil berhasil diperbarui', 'success');
+
+                    // Refresh display
+                    initPage();
+                    loadProfileData();
+                } catch (error) {
+                    console.error('Upload failed:', error);
+                    Utils.showToast('Gagal mengupload foto', 'error');
+                }
+            }
         }
 
         function saveProfile(e) {

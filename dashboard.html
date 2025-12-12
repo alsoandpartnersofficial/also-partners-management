@@ -296,8 +296,7 @@
             document.getElementById('sidebar-firm-name').textContent = firm.firmName;
 
             // Update header user info
-            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
-            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+            Utils.setAvatar('header-avatar', user);
             document.getElementById('header-user-name').textContent = user.fullName;
             document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
 
