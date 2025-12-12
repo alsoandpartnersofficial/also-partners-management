@@ -94,24 +94,8 @@
                                         <i class="fas fa-plus"></i> Tambah Item
                                     </button>
                                 </div>
-                                <div class="card-body p-0">
-                                    <div class="table-container">
-                                        <table class="data-table">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 40%;">Deskripsi</th>
-                                                    <th style="width: 10%;">Qty</th>
-                                                    <th style="width: 15%;">Satuan</th>
-                                                    <th style="width: 20%;">Harga</th>
-                                                    <th style="width: 15%;">Subtotal</th>
-                                                    <th style="width: 50px;"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="items-table">
-                                                <!-- Items populated by JS -->
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                <div class="card-body" id="items-container">
+                                    <!-- Items populated by JS -->
                                 </div>
                             </div>
 
@@ -335,43 +319,133 @@
         }
 
         function renderItems() {
-            const tbody = document.getElementById('items-table');
+            const container = document.getElementById('items-container');
 
-            tbody.innerHTML = items.map(item => `
-                <tr>
-                    <td>
-                        <input type="text" class="form-control" value="${item.description}" 
-                               onchange="updateItem(${item.id}, 'description', this.value)"
-                               placeholder="Deskripsi layanan" required>
-                    </td>
-                    <td>
-                        <input type="number" class="form-control" value="${item.quantity}" min="1"
-                               onchange="updateItem(${item.id}, 'quantity', this.value)"
-                               style="text-align: center;">
-                    </td>
-                    <td>
-                        <select class="form-control" onchange="updateItem(${item.id}, 'unit', this.value)">
-                            <option value="layanan" ${item.unit === 'layanan' ? 'selected' : ''}>Layanan</option>
-                            <option value="jam" ${item.unit === 'jam' ? 'selected' : ''}>Jam</option>
-                            <option value="dokumen" ${item.unit === 'dokumen' ? 'selected' : ''}>Dokumen</option>
-                            <option value="hari" ${item.unit === 'hari' ? 'selected' : ''}>Hari</option>
-                            <option value="unit" ${item.unit === 'unit' ? 'selected' : ''}>Unit</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="number" class="form-control" value="${item.unitPrice}" min="0"
-                               onchange="updateItem(${item.id}, 'unitPrice', this.value)"
-                               placeholder="0">
-                    </td>
-                    <td class="font-medium">
-                        ${Utils.formatCurrency(item.amount)}
-                    </td>
-                    <td>
-                        <button type="button" class="icon-btn danger" onclick="removeItem(${item.id})">
-                            <i class="fas fa-trash"></i>
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        <i class="fas fa-file-invoice" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--gray-300);"></i>
+                        <p>Belum ada item. Klik "Tambah Item" untuk menambahkan layanan.</p>
+                    </div>
+                `;
+                calculateTotal();
+                return;
+            }
+
+            container.innerHTML = items.map((item, index) => `
+                <div class="invoice-item" style="
+                    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+                    border: 1px solid var(--gray-200);
+                    border-radius: 12px;
+                    padding: 1.25rem;
+                    margin-bottom: 1rem;
+                    position: relative;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                " onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" 
+                   onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'">
+                    
+                    <!-- Item Header with Number and Delete -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span style="
+                                width: 28px; 
+                                height: 28px; 
+                                background: linear-gradient(135deg, var(--primary-navy), #2d4a6f);
+                                color: white;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 0.75rem;
+                                font-weight: 600;
+                            ">${index + 1}</span>
+                            <span style="font-weight: 600; color: var(--primary-navy);">Item Layanan</span>
+                        </div>
+                        <button type="button" onclick="removeItem(${item.id})" style="
+                            width: 32px;
+                            height: 32px;
+                            border: none;
+                            background: var(--danger);
+                            color: white;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            transition: all 0.2s;
+                        " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                            <i class="fas fa-trash-alt"></i>
                         </button>
-                    </td>
-                </tr>
+                    </div>
+
+                    <!-- Description Field - Full Width -->
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i class="fas fa-file-alt" style="margin-right: 0.25rem;"></i> Deskripsi Layanan
+                        </label>
+                        <textarea 
+                            class="form-control" 
+                            rows="2"
+                            placeholder="Contoh: Konsultasi hukum terkait perjanjian kerja sama..."
+                            onchange="updateItem(${item.id}, 'description', this.value)"
+                            style="width: 100%; resize: vertical; min-height: 60px;"
+                        >${item.description}</textarea>
+                    </div>
+
+                    <!-- Grid for Quantity, Unit, Price -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1.5fr 1.5fr; gap: 1rem; align-items: end;">
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="fas fa-hashtag" style="margin-right: 0.25rem;"></i> Jumlah
+                            </label>
+                            <input type="number" class="form-control" value="${item.quantity}" min="1"
+                                   onchange="updateItem(${item.id}, 'quantity', this.value)"
+                                   style="text-align: center; font-weight: 600;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="fas fa-tag" style="margin-right: 0.25rem;"></i> Satuan
+                            </label>
+                            <select class="form-control" onchange="updateItem(${item.id}, 'unit', this.value)">
+                                <option value="layanan" ${item.unit === 'layanan' ? 'selected' : ''}>Layanan</option>
+                                <option value="jam" ${item.unit === 'jam' ? 'selected' : ''}>Jam</option>
+                                <option value="dokumen" ${item.unit === 'dokumen' ? 'selected' : ''}>Dokumen</option>
+                                <option value="hari" ${item.unit === 'hari' ? 'selected' : ''}>Hari</option>
+                                <option value="unit" ${item.unit === 'unit' ? 'selected' : ''}>Unit</option>
+                                <option value="bulan" ${item.unit === 'bulan' ? 'selected' : ''}>Bulan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="fas fa-money-bill-wave" style="margin-right: 0.25rem;"></i> Harga Satuan
+                            </label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 0.875rem;">Rp</span>
+                                <input type="number" class="form-control" value="${item.unitPrice}" min="0"
+                                       onchange="updateItem(${item.id}, 'unitPrice', this.value)"
+                                       placeholder="0"
+                                       style="padding-left: 35px;">
+                            </div>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="fas fa-calculator" style="margin-right: 0.25rem;"></i> Subtotal
+                            </label>
+                            <div style="
+                                background: linear-gradient(135deg, var(--primary-navy), var(--accent-gold));
+                                color: white;
+                                padding: 0.625rem 1rem;
+                                border-radius: 8px;
+                                font-weight: 700;
+                                font-size: 0.9375rem;
+                                text-align: center;
+                            ">
+                                ${Utils.formatCurrency(item.amount)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             `).join('');
 
             calculateTotal();
