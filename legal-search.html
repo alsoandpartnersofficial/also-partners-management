@@ -440,45 +440,74 @@
             
             Pertanyaan: ${query}`;
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: prompt }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 2048
+            // Try multiple models in order of preference
+            const models = [
+                { endpoint: 'v1beta', model: 'gemini-2.0-flash-exp' },
+                { endpoint: 'v1beta', model: 'gemini-1.5-flash-latest' },
+                { endpoint: 'v1beta', model: 'gemini-1.5-flash' },
+                { endpoint: 'v1beta', model: 'gemini-1.5-pro' },
+                { endpoint: 'v1beta', model: 'gemini-pro' },
+                { endpoint: 'v1', model: 'gemini-pro' }
+            ];
+
+            let lastError = null;
+
+            for (const { endpoint, model } of models) {
+                try {
+                    console.log(`Trying model: ${model} with ${endpoint}...`);
+
+                    const response = await fetch(`https://generativelanguage.googleapis.com/${endpoint}/models/${model}:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{ text: prompt }]
+                            }],
+                            generationConfig: {
+                                temperature: 0.7,
+                                maxOutputTokens: 2048
+                            }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        console.log(`Model ${model} failed:`, errorData.error?.message);
+                        lastError = errorData.error?.message || 'API request failed';
+                        continue; // Try next model
                     }
-                })
-            });
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error('API Error:', errorData);
-                throw new Error(errorData.error?.message || 'API request failed');
+                    const data = await response.json();
+
+                    if (!data.candidates || !data.candidates[0]) {
+                        console.log(`Model ${model}: No candidates`);
+                        continue; // Try next model
+                    }
+
+                    console.log(`Success with model: ${model}`);
+                    let text = data.candidates[0].content.parts[0].text;
+
+                    // Convert markdown to HTML
+                    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                    text = text.replace(/^### (.*$)/gm, '<h4>$1</h4>');
+                    text = text.replace(/^## (.*$)/gm, '<h3>$1</h3>');
+                    text = text.replace(/^# (.*$)/gm, '<h3>$1</h3>');
+                    text = text.replace(/^- (.*$)/gm, '<li>$1</li>');
+                    text = text.replace(/\n\n/g, '</p><p>');
+
+                    return text;
+                } catch (error) {
+                    console.log(`Model ${model} error:`, error.message);
+                    lastError = error.message;
+                    continue;
+                }
             }
 
-            const data = await response.json();
-
-            if (!data.candidates || !data.candidates[0]) {
-                throw new Error('No response from AI');
-            }
-
-            let text = data.candidates[0].content.parts[0].text;
-
-            // Convert markdown to HTML if needed
-            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            text = text.replace(/^### (.*$)/gm, '<h4>$1</h4>');
-            text = text.replace(/^## (.*$)/gm, '<h3>$1</h3>');
-            text = text.replace(/^- (.*$)/gm, '<li>$1</li>');
-            text = text.replace(/\n\n/g, '</p><p>');
-
-            return text;
+            // All models failed
+            throw new Error(lastError || 'Tidak ada model AI yang tersedia. Pastikan API Key valid.');
         }
 
         async function simulateAIResponse(query) {
