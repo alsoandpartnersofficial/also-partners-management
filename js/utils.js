@@ -406,10 +406,16 @@ const Utils = {
         const element = document.getElementById(elementId);
         if (!element) return;
 
-        if (user && user.avatar) {
-            element.innerHTML = `<img src="${user.avatar}" alt="${user.fullName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        // Check if avatar string is valid (starts with data:image)
+        if (user && user.avatar && typeof user.avatar === 'string' && user.avatar.startsWith('data:image')) {
+            const initials = this.getInitials(user ? user.fullName : '?');
+            const color = this.stringToColor(user ? user.fullName : '?');
+
+            // Create image with fallback
+            element.innerHTML = `<img src="${user.avatar}" alt="${user.fullName}" 
+                style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;"
+                onerror="this.style.display='none'; this.parentNode.textContent='${initials}'; this.parentNode.style.background='${color}';">`;
             element.style.background = 'transparent';
-            element.textContent = '';
         } else {
             element.innerHTML = '';
             element.textContent = this.getInitials(user ? user.fullName : '?');
@@ -438,8 +444,15 @@ const Utils = {
                     elem.width = width;
                     elem.height = height;
                     const ctx = elem.getContext('2d');
+
+                    // Fill white background for JPEGs (handles transparency)
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, elem.width, elem.height);
+
                     ctx.drawImage(img, 0, 0, width, height);
-                    resolve(elem.toDataURL(file.type, quality));
+
+                    // Force JPEG for better compression and compatibility
+                    resolve(elem.toDataURL('image/jpeg', quality));
                 };
                 img.onerror = error => reject(error);
             };
