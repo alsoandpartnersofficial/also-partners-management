@@ -50,10 +50,25 @@
                         <button class="notification-btn" onclick="App.toggleTheme()">
                             <i id="theme-icon" class="fas fa-moon"></i>
                         </button>
-                        <button class="notification-btn">
-                            <i class="fas fa-bell"></i>
-                            <span class="notification-badge" id="notification-count">3</span>
-                        </button>
+                        <div class="dropdown" id="notification-dropdown">
+                            <button class="notification-btn dropdown-trigger">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-badge" id="notification-count">0</span>
+                            </button>
+                            <div class="dropdown-menu" style="width: 320px; right: 0; left: auto;">
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--gray-200);">
+                                    <h4 style="margin: 0;">Notifikasi</h4>
+                                </div>
+                                <div id="notification-list" style="max-height: 300px; overflow-y: auto;">
+                                    <!-- Populated by JS -->
+                                </div>
+                                <div
+                                    style="padding: 0.75rem; border-top: 1px solid var(--gray-200); text-align: center;">
+                                    <a href="schedule.html"
+                                        style="font-size: 0.875rem; color: var(--primary-navy);">Lihat Semua Jadwal</a>
+                                </div>
+                            </div>
+                        </div>
                         <div class="dropdown">
                             <div class="user-menu dropdown-trigger">
                                 <div class="user-avatar" id="header-avatar"></div>
@@ -280,6 +295,9 @@
                 document.getElementById('recent-invoices-card').style.display = 'block';
                 renderRecentInvoices();
             }
+
+            // Notifications
+            renderNotifications();
         });
 
         function renderQuickActions(role) {
@@ -455,6 +473,96 @@
                     </tr>
                 `;
             }).join('');
+        }
+
+        function renderNotifications() {
+            const user = Auth.getCurrentUser();
+            const notifications = [];
+
+            // Get upcoming schedules (next 7 days)
+            const now = new Date();
+            const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            let schedules = DataManager.getSchedules();
+
+            if (!Auth.canViewAllCases()) {
+                schedules = schedules.filter(s => s.userId === user.id);
+            }
+
+            schedules
+                .filter(s => {
+                    const startTime = new Date(s.startTime);
+                    return startTime >= now && startTime <= weekFromNow && !s.isCompleted;
+                })
+                .forEach(s => {
+                    const daysUntil = Utils.daysUntil(s.startTime);
+                    let urgency = 'info';
+                    if (daysUntil <= 1) urgency = 'danger';
+                    else if (daysUntil <= 3) urgency = 'warning';
+
+                    notifications.push({
+                        type: s.eventType,
+                        title: s.title,
+                        subtitle: daysUntil === 0 ? 'Hari ini' : daysUntil === 1 ? 'Besok' : `${daysUntil} hari lagi`,
+                        icon: s.eventType === 'hearing' ? 'fa-gavel' : s.eventType === 'meeting' ? 'fa-handshake' : 'fa-clock',
+                        urgency: urgency,
+                        href: 'schedule.html'
+                    });
+                });
+
+            // Get unpaid invoices (for those who can see invoices)
+            if (Auth.canManageInvoices()) {
+                const invoices = DataManager.getInvoices().filter(i => i.status === 'unpaid' || i.status === 'partial');
+                invoices.forEach(inv => {
+                    const daysUntil = Utils.daysUntil(inv.dueDate);
+                    if (daysUntil <= 7) {
+                        const client = DataManager.getClientById(inv.clientId);
+                        notifications.push({
+                            type: 'invoice',
+                            title: `Invoice ${inv.invoiceNumber}`,
+                            subtitle: daysUntil < 0 ? 'Sudah jatuh tempo!' : daysUntil === 0 ? 'Jatuh tempo hari ini' : `Jatuh tempo ${daysUntil} hari lagi`,
+                            icon: 'fa-file-invoice-dollar',
+                            urgency: daysUntil < 0 ? 'danger' : daysUntil <= 3 ? 'warning' : 'info',
+                            href: `invoice-print.html?id=${inv.id}`
+                        });
+                    }
+                });
+            }
+
+            // Update notification count
+            const countEl = document.getElementById('notification-count');
+            countEl.textContent = notifications.length;
+            countEl.style.display = notifications.length > 0 ? 'flex' : 'none';
+
+            // Render notification list
+            const container = document.getElementById('notification-list');
+
+            if (notifications.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+                        <i class="fas fa-check-circle" style="font-size: 2rem; color: var(--success); margin-bottom: 0.5rem;"></i>
+                        <p style="margin: 0;">Tidak ada notifikasi</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const urgencyColors = {
+                danger: 'var(--danger)',
+                warning: 'var(--warning)',
+                info: 'var(--info)'
+            };
+
+            container.innerHTML = notifications.slice(0, 10).map(n => `
+                <a href="${n.href}" class="dropdown-item" style="display: flex; gap: 0.75rem; padding: 0.75rem 1rem; text-decoration: none;">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: ${urgencyColors[n.urgency]}20; color: ${urgencyColors[n.urgency]}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i class="fas ${n.icon}"></i>
+                    </div>
+                    <div style="min-width: 0; flex: 1;">
+                        <div style="font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.title}</div>
+                        <div style="font-size: 0.75rem; color: ${urgencyColors[n.urgency]};">${n.subtitle}</div>
+                    </div>
+                </a>
+            `).join('');
         }
     </script>
 </body>
