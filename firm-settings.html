@@ -71,13 +71,14 @@
                                         style="max-width: 100%; max-height: 100%; object-fit: contain;">
                                 </div>
 
-                                <div class="file-upload" style="padding: 1rem;">
+                                <label for="logo-input" class="file-upload"
+                                    style="padding: 1rem; cursor: pointer; display: block;">
                                     <i class="fas fa-cloud-upload-alt"
                                         style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
-                                    <p class="text-sm">Upload logo baru</p>
+                                    <p class="text-sm">Klik untuk upload logo baru</p>
                                     <p class="text-sm text-secondary">PNG, JPG, SVG (Max 2MB)</p>
-                                    <input type="file" id="logo-input" accept="image/*">
-                                </div>
+                                </label>
+                                <input type="file" id="logo-input" accept="image/*" style="display: none;">
 
                                 <button class="btn btn-secondary btn-sm mt-md" onclick="resetLogo()">
                                     <i class="fas fa-undo"></i> Reset ke Default
