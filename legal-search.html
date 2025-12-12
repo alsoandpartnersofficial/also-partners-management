@@ -442,12 +442,11 @@
 
             // Try multiple models in order of preference
             const models = [
+                { endpoint: 'v1beta', model: 'gemini-2.5-flash' },
                 { endpoint: 'v1beta', model: 'gemini-2.0-flash-exp' },
                 { endpoint: 'v1beta', model: 'gemini-1.5-flash-latest' },
                 { endpoint: 'v1beta', model: 'gemini-1.5-flash' },
-                { endpoint: 'v1beta', model: 'gemini-1.5-pro' },
-                { endpoint: 'v1beta', model: 'gemini-pro' },
-                { endpoint: 'v1', model: 'gemini-pro' }
+                { endpoint: 'v1beta', model: 'gemini-pro' }
             ];
 
             let lastError = null;
