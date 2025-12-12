@@ -102,135 +102,172 @@
                     <p class="text-secondary" id="welcome-date"></p>
                 </div>
 
-                <!-- Statistics Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon blue">
+                <!-- Stats Grid (Tresto Style) -->
+                <div class="stats-grid"
+                    style="grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div class="card stat-card"
+                        style="padding: 1.5rem; border: none; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;">
+                        <div
+                            style="position: absolute; right: -10px; top: -10px; font-size: 5rem; color: rgba(26, 35, 126, 0.05); transform: rotate(15deg);">
                             <i class="fas fa-briefcase"></i>
                         </div>
-                        <div class="stat-content">
-                            <h4>Total Kasus</h4>
-                            <div class="stat-value" id="stat-total-cases">0</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span id="stat-active-cases">0 aktif</span>
+                        <div style="position: relative; z-index: 1;">
+                            <h4
+                                style="color: var(--text-secondary); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">
+                                Total Kasus</h4>
+                            <div class="d-flex align-items-baseline gap-sm">
+                                <h2 id="stat-total-cases"
+                                    style="font-size: 2rem; font-weight: 700; color: var(--primary-navy); margin: 0;">0
+                                </h2>
+                                <span class="badge badge-primary" id="stat-active-cases"
+                                    style="background: rgba(26, 35, 126, 0.1); color: var(--primary-navy);">0
+                                    Aktif</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="stat-card">
-                        <div class="stat-icon gold">
+                    <div class="card stat-card"
+                        style="padding: 1.5rem; border: none; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;">
+                        <div
+                            style="position: absolute; right: -10px; top: -10px; font-size: 5rem; color: rgba(198, 167, 0, 0.05); transform: rotate(15deg);">
                             <i class="fas fa-users"></i>
                         </div>
-                        <div class="stat-content">
-                            <h4>Total Klien</h4>
-                            <div class="stat-value" id="stat-total-clients">0</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>Bulan ini</span>
+                        <div style="position: relative; z-index: 1;">
+                            <h4
+                                style="color: var(--text-secondary); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">
+                                Klien</h4>
+                            <div class="d-flex align-items-baseline gap-sm">
+                                <h2 id="stat-total-clients"
+                                    style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin: 0;">0
+                                </h2>
+                                <span class="text-success text-sm"><i class="fas fa-arrow-up"></i> Baru</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="stat-card">
-                        <div class="stat-icon green">
-                            <i class="fas fa-file-invoice-dollar"></i>
+                    <div class="card stat-card"
+                        style="padding: 1.5rem; border: none; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;">
+                        <div
+                            style="position: absolute; right: -10px; top: -10px; font-size: 5rem; color: rgba(0, 210, 91, 0.05); transform: rotate(15deg);">
+                            <i class="fas fa-wallet"></i>
                         </div>
-                        <div class="stat-content">
-                            <h4>Pendapatan</h4>
-                            <div class="stat-value" id="stat-revenue">Rp 0</div>
-                            <div class="stat-change" id="stat-pending">
-                                <span>Pending: Rp 0</span>
+                        <div style="position: relative; z-index: 1;">
+                            <h4
+                                style="color: var(--text-secondary); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">
+                                Pendapatan</h4>
+                            <div class="d-flex align-items-baseline gap-sm">
+                                <h2 id="stat-revenue"
+                                    style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary); margin: 0;">
+                                    Rp 0</h2>
+                            </div>
+                            <div id="stat-pending"
+                                style="font-size: 0.75rem; color: var(--warning); margin-top: 0.25rem;">Pending: Rp 0
                             </div>
                         </div>
                     </div>
 
-                    <div class="stat-card">
-                        <div class="stat-icon purple">
-                            <i class="fas fa-calendar-check"></i>
+                    <div class="card stat-card"
+                        style="padding: 1.5rem; border: none; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;">
+                        <div
+                            style="position: absolute; right: -10px; top: -10px; font-size: 5rem; color: rgba(252, 75, 108, 0.05); transform: rotate(15deg);">
+                            <i class="fas fa-calendar-alt"></i>
                         </div>
-                        <div class="stat-content">
-                            <h4>Jadwal Mendatang</h4>
-                            <div class="stat-value" id="stat-events">0</div>
-                            <div class="stat-change">
-                                <span>Event terjadwal</span>
+                        <div style="position: relative; z-index: 1;">
+                            <h4
+                                style="color: var(--text-secondary); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">
+                                Jadwal</h4>
+                            <div class="d-flex align-items-baseline gap-sm">
+                                <h2 id="stat-events"
+                                    style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin: 0;">0
+                                </h2>
+                                <span class="text-info text-sm">Minggu ini</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="card mb-xl" id="quick-actions-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-bolt mr-sm"></i> Aksi Cepat</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="quick-actions" id="quick-actions">
-                            <!-- Populated by JS based on role -->
-                        </div>
-                    </div>
-                </div>
+                <!-- Main Grid: 2/3 Content, 1/3 Sidebar -->
+                <div class="d-grid gap-lg" style="grid-template-columns: 2fr 1fr;">
 
-                <div class="d-grid grid-cols-2 gap-lg" style="grid-template-columns: 1fr 1fr;">
-                    <!-- Recent Cases -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-briefcase mr-sm"></i> Kasus Terbaru</h3>
-                            <a href="cases.html" class="btn btn-sm btn-secondary">Lihat Semua</a>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-container">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Kasus</th>
-                                            <th>Klien</th>
-                                            <th>Status</th>
-                                            <th>Progress</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="recent-cases">
-                                        <!-- Populated by JS -->
-                                    </tbody>
-                                </table>
+                    <!-- Left Column -->
+                    <div class="d-flex flex-column gap-lg">
+                        <!-- Ongoing Cases -->
+                        <div class="card">
+                            <div class="card-header border-0 pb-0 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary-navy);">Kasus
+                                        Berjalan</h3>
+                                    <p class="text-secondary text-sm mb-0">Update terbaru perkembangan kasus</p>
+                                </div>
+                                <a href="cases.html" class="btn btn-sm btn-primary"
+                                    style="border-radius: 20px; padding: 0.35rem 1rem;">Lihat Semua</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-container">
+                                    <table class="data-table"
+                                        style="border-collapse: separate; border-spacing: 0 0.5rem;">
+                                        <thead>
+                                            <tr>
+                                                <th style="background: transparent; border: none;">Kasus</th>
+                                                <th style="background: transparent; border: none;">Klien</th>
+                                                <th style="background: transparent; border: none;">Status</th>
+                                                <th style="background: transparent; border: none;">Progress</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recent-cases">
+                                            <!-- Populated by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Upcoming Events -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-calendar-alt mr-sm"></i> Jadwal Mendatang</h3>
-                            <a href="schedule.html" class="btn btn-sm btn-secondary">Lihat Semua</a>
-                        </div>
-                        <div class="card-body" id="upcoming-events">
-                            <!-- Populated by JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Invoices (for admin/owner/partner) -->
-                <div class="card mt-xl" id="recent-invoices-card" style="display: none;">
-                    <div class="card-header">
-                        <h3><i class="fas fa-file-invoice-dollar mr-sm"></i> Invoice Terbaru</h3>
-                        <a href="invoices.html" class="btn btn-sm btn-secondary">Lihat Semua</a>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>No. Invoice</th>
-                                        <th>Klien</th>
-                                        <th>Jumlah</th>
-                                        <th>Status</th>
-                                        <th>Jatuh Tempo</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="recent-invoices">
+                        <!-- Quick Actions Panel -->
+                        <div class="card">
+                            <div class="card-header border-0">
+                                <h3
+                                    style="font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">
+                                    Aksi Cepat</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="quick-actions" id="quick-actions"
+                                    style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem;">
                                     <!-- Populated by JS -->
-                                </tbody>
-                            </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="d-flex flex-column gap-lg">
+                        <!-- Upcoming Events List -->
+                        <div class="card">
+                            <div class="card-header border-0 pb-0">
+                                <h3 style="font-size: 1.25rem; font-weight: 700;">Jadwal Mendatang</h3>
+                            </div>
+                            <div class="card-body pt-md">
+                                <div id="upcoming-events" class="d-flex flex-column gap-md">
+                                    <!-- Populated by JS -->
+                                </div>
+                                <a href="schedule.html" class="btn btn-block btn-secondary mt-md w-100"
+                                    style="background: var(--bg-tertiary); border: none;">Lihat Kalender</a>
+                            </div>
+                        </div>
+
+                        <!-- Recent Invoices Mini -->
+                        <div class="card" id="recent-invoices-card" style="display: none;">
+                            <div class="card-header border-0 pb-0">
+                                <h3 style="font-size: 1.25rem; font-weight: 700;">Tagihan Belum Dibayar</h3>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-container">
+                                    <table class="data-table">
+                                        <tbody id="recent-invoices">
+                                            <!-- Populated by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

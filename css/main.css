@@ -10,43 +10,46 @@
    CSS VARIABLES - Design Tokens
    ===================================================== */
 :root {
-    /* Primary Colors */
-    --primary-navy: #1E3A5F;
-    --primary-navy-light: #2C5282;
-    --primary-navy-dark: #152A45;
-    
+    /* Premium Color Palette (Tresto-inspired) */
+    --primary-navy: #1a237e;
+    /* Deeper Navy */
+    --primary-navy-light: #283593;
+    --primary-navy-dark: #000051;
+
     /* Accent Colors */
-    --accent-gold: #D4AF37;
-    --accent-gold-light: #E5C158;
-    --accent-gold-dark: #B8972E;
-    
+    --accent-gold: #c6a700;
+    /* Richer Gold */
+    --accent-gold-light: #ffe082;
+    --accent-gold-dark: #957500;
+
     /* Status Colors */
-    --success: #10B981;
-    --success-light: #D1FAE5;
-    --warning: #F59E0B;
-    --warning-light: #FEF3C7;
-    --danger: #EF4444;
-    --danger-light: #FEE2E2;
-    --info: #3B82F6;
-    --info-light: #DBEAFE;
-    
-    /* Neutral Colors */
-    --white: #FFFFFF;
-    --gray-50: #F9FAFB;
-    --gray-100: #F3F4F6;
-    --gray-200: #E5E7EB;
-    --gray-300: #D1D5DB;
-    --gray-400: #9CA3AF;
-    --gray-500: #6B7280;
-    --gray-600: #4B5563;
-    --gray-700: #374151;
-    --gray-800: #1F2937;
-    --gray-900: #111827;
-    
-    /* Typography */
-    --font-heading: 'Playfair Display', Georgia, serif;
-    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    
+    --success: #00d25b;
+    /* Vibrant Green */
+    --success-light: #e0f7fa;
+    --warning: #ffab00;
+    /* Amber */
+    --warning-light: #fff8e1;
+    --danger: #fc4b6c;
+    /* Soft Red */
+    --danger-light: #ffebee;
+    --info: #0090e7;
+    /* Bright Blue */
+    --info-light: #e3f2fd;
+
+    /* Backgrounds */
+    --bg-primary: #f4f5f7;
+    /* Very light cool grey */
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f8f9fa;
+    --bg-sidebar: #ffffff;
+    /* White sidebar for cleaner look */
+
+    /* Text */
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-muted: #adb5bd;
+    --white: #ffffff;
+
     /* Spacing */
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
@@ -54,28 +57,33 @@
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
     --spacing-2xl: 3rem;
-    
+
     /* Border Radius */
-    --radius-sm: 0.375rem;
-    --radius-md: 0.5rem;
-    --radius-lg: 0.75rem;
-    --radius-xl: 1rem;
-    --radius-full: 9999px;
-    
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 15px;
+    --radius-xl: 20px;
+    --radius-full: 50rem;
+
+    /* Shadows (Premium) */
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.02);
+    --shadow-md: 0 0 35px 0 rgba(154, 161, 171, 0.15);
+    /* Tresto signature shadow */
+    --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.08);
+    --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.1);
+
     /* Transitions */
     --transition-fast: 150ms ease;
     --transition-normal: 300ms ease;
-    --transition-slow: 500ms ease;
-    
+
     /* Layout */
-    --sidebar-width: 280px;
-    --header-height: 70px;
+    --sidebar-width: 270px;
+    --header-height: 80px;
+
+    /* Typography */
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+    --border-color: #f0f0f0;
 }
 
 /* Dark Mode Variables */
@@ -100,7 +108,9 @@
 /* =====================================================
    BASE STYLES
    ===================================================== */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -124,19 +134,41 @@ body {
 /* =====================================================
    TYPOGRAPHY
    ===================================================== */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: var(--font-heading);
     font-weight: 600;
     line-height: 1.3;
     color: var(--text-primary);
 }
 
-h1 { font-size: 2.5rem; }
-h2 { font-size: 2rem; }
-h3 { font-size: 1.5rem; }
-h4 { font-size: 1.25rem; }
-h5 { font-size: 1.125rem; }
-h6 { font-size: 1rem; }
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+}
+
+h5 {
+    font-size: 1.125rem;
+}
+
+h6 {
+    font-size: 1rem;
+}
 
 p {
     margin-bottom: var(--spacing-md);
@@ -189,8 +221,15 @@ a:hover {
 }
 
 @keyframes float {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    50% { transform: translate(30px, 30px) rotate(5deg); }
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    50% {
+        transform: translate(30px, 30px) rotate(5deg);
+    }
 }
 
 .login-card {
@@ -211,6 +250,7 @@ a:hover {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -350,8 +390,9 @@ a:hover {
 
 .sidebar {
     width: var(--sidebar-width);
-    background: linear-gradient(180deg, var(--primary-navy) 0%, var(--primary-navy-dark) 100%);
-    color: var(--white);
+    background: var(--bg-sidebar);
+    color: var(--text-primary);
+    /* Changed to dark text */
     position: fixed;
     top: 0;
     left: 0;
@@ -359,35 +400,42 @@ a:hover {
     overflow-y: auto;
     z-index: 100;
     transition: transform var(--transition-normal);
+    box-shadow: var(--shadow-lg);
+    /* Added shadow */
+    border-right: 1px solid var(--border-color);
 }
 
 .sidebar-header {
     padding: var(--spacing-lg);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--border-color);
+    /* Updated for light theme */
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
 }
 
-.sidebar-logo {
-    width: 50px;
-    height: 50px;
-    border-radius: var(--radius-md);
-    object-fit: contain;
-    background: var(--white);
-    padding: 5px;
-}
-
 .sidebar-brand h2 {
     font-size: 1.125rem;
-    color: var(--white);
+    color: var(--primary-navy);
+    /* Dark text */
     font-family: var(--font-heading);
 }
 
 .sidebar-brand p {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
+    /* Darker secondary text */
     margin: 0;
+}
+
+.sidebar-logo {
+    width: 45px;
+    height: 45px;
+    border-radius: var(--radius-md);
+    object-fit: contain;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 5px;
 }
 
 .sidebar-nav {
@@ -403,8 +451,10 @@ a:hover {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
+    /* Darker muted text */
     margin-bottom: var(--spacing-sm);
+    font-weight: 600;
 }
 
 .nav-item {
@@ -412,21 +462,23 @@ a:hover {
     align-items: center;
     gap: var(--spacing-md);
     padding: 0.875rem var(--spacing-lg);
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-secondary);
+    /* Dark secondary text */
     transition: all var(--transition-fast);
     cursor: pointer;
     border-left: 3px solid transparent;
+    font-weight: 500;
 }
 
 .nav-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--white);
+    background: var(--bg-tertiary);
+    color: var(--primary-navy);
 }
 
 .nav-item.active {
-    background: rgba(212, 175, 55, 0.15);
-    border-left-color: var(--accent-gold);
-    color: var(--accent-gold);
+    background: linear-gradient(90deg, rgba(26, 35, 126, 0.08) 0%, rgba(26, 35, 126, 0.0) 100%);
+    border-left-color: var(--primary-navy);
+    color: var(--primary-navy);
 }
 
 .nav-item i {
@@ -808,9 +860,17 @@ a:hover {
     border-radius: var(--radius-full);
 }
 
-.status-dot.active::before { background: var(--success); }
-.status-dot.pending::before { background: var(--warning); }
-.status-dot.inactive::before { background: var(--danger); }
+.status-dot.active::before {
+    background: var(--success);
+}
+
+.status-dot.pending::before {
+    background: var(--warning);
+}
+
+.status-dot.inactive::before {
+    background: var(--danger);
+}
 
 /* Progress Bar */
 .progress-bar {
@@ -1038,6 +1098,7 @@ select.form-control {
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -1452,15 +1513,15 @@ select.form-control {
     .sidebar {
         transform: translateX(-100%);
     }
-    
+
     .sidebar.active {
         transform: translateX(0);
     }
-    
+
     .main-content {
         margin-left: 0;
     }
-    
+
     .form-row {
         grid-template-columns: 1fr;
     }
@@ -1470,24 +1531,24 @@ select.form-control {
     .stats-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .header-search {
         display: none;
     }
-    
+
     .page-content {
         padding: var(--spacing-md);
     }
-    
+
     .invoice-header {
         flex-direction: column;
         gap: 20px;
     }
-    
+
     .invoice-title {
         text-align: left;
     }
-    
+
     .invoice-meta {
         grid-template-columns: 1fr;
     }
@@ -1502,17 +1563,17 @@ select.form-control {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
-    
+
     .sidebar,
     .header,
     .no-print {
         display: none !important;
     }
-    
+
     .main-content {
         margin-left: 0 !important;
     }
-    
+
     .invoice-preview {
         box-shadow: none;
         padding: 0;
@@ -1523,13 +1584,25 @@ select.form-control {
    ANIMATIONS
    ===================================================== */
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 .animate-fade-in {
@@ -1551,7 +1624,9 @@ select.form-control {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .loading-overlay {
