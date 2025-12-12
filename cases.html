@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cases - Also and Partners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Logo" class="sidebar-logo" id="sidebar-logo">
+                <div class="sidebar-brand">
+                    <h2 id="sidebar-firm-name">Also and Partners</h2>
+                    <p>Advocates & Legal Consultants</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-menu-toggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <h1>Cases</h1>
+                </div>
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="notification-btn" onclick="App.toggleTheme()">
+                            <i id="theme-icon" class="fas fa-moon"></i>
+                        </button>
+                        <div class="dropdown">
+                            <div class="user-menu dropdown-trigger">
+                                <div class="user-avatar" id="header-avatar"></div>
+                                <div class="user-info">
+                                    <h4 id="header-user-name">User</h4>
+                                    <p id="header-user-role">Role</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                                    <i class="fas fa-user"></i><span>Profile</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="Auth.logout()">
+                                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <!-- Statistics -->
+                <div class="stats-grid mb-xl">
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-briefcase"></i></div>
+                        <div class="stat-content">
+                            <h4>Total Kasus</h4>
+                            <div class="stat-value" id="stat-total">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon gold"><i class="fas fa-spinner"></i></div>
+                        <div class="stat-content">
+                            <h4>In Progress</h4>
+                            <div class="stat-value" id="stat-progress">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="fas fa-pause-circle"></i></div>
+                        <div class="stat-content">
+                            <h4>Pending</h4>
+                            <div class="stat-value" id="stat-pending">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-content">
+                            <h4>Closed</h4>
+                            <div class="stat-value" id="stat-closed">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="card mb-lg">
+                    <div class="card-body">
+                        <div class="filter-bar">
+                            <div class="header-search" style="flex: 1;">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-input" placeholder="Cari kasus..." style="width: 100%;">
+                            </div>
+                            <select class="form-control" id="filter-status" style="width: 150px;">
+                                <option value="">Semua Status</option>
+                                <option value="open">Open</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="pending">Pending</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                            <select class="form-control" id="filter-priority" style="width: 150px;">
+                                <option value="">Semua Prioritas</option>
+                                <option value="urgent">Urgent</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="openAddModal()">
+                                <i class="fas fa-plus"></i> Tambah Kasus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cases Table -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>No. Kasus</th>
+                                        <th>Judul</th>
+                                        <th>Klien</th>
+                                        <th>Lawyers</th>
+                                        <th>Status</th>
+                                        <th>Prioritas</th>
+                                        <th>Progress</th>
+                                        <th>Deadline</th>
+                                        <th style="width: 100px;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cases-table">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Case Modal -->
+    <div class="modal-overlay" id="case-modal">
+        <div class="modal" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 id="modal-title">Tambah Kasus Baru</h3>
+                <button class="modal-close" onclick="Utils.closeModal('case-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="case-form">
+                    <input type="hidden" id="case-id">
+
+                    <div class="form-group">
+                        <label class="form-label required">Judul Kasus</label>
+                        <input type="text" class="form-control" id="case-title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Deskripsi</label>
+                        <textarea class="form-control" id="case-description" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Klien</label>
+                            <select class="form-control" id="case-client" required>
+                                <option value="">Pilih Klien</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Tipe Kasus</label>
+                            <select class="form-control" id="case-type" required>
+                                <option value="">Pilih Tipe</option>
+                                <option value="corporate">Corporate</option>
+                                <option value="litigation">Litigation</option>
+                                <option value="family">Family</option>
+                                <option value="criminal">Criminal</option>
+                                <option value="property">Property</option>
+                                <option value="contract">Contract</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Status</label>
+                            <select class="form-control" id="case-status" required>
+                                <option value="open">Open</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="pending">Pending</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Prioritas</label>
+                            <select class="form-control" id="case-priority" required>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Tanggal Mulai</label>
+                            <input type="date" class="form-control" id="case-start" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Deadline</label>
+                            <input type="date" class="form-control" id="case-deadline" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Assign Lawyers</label>
+                        <div id="lawyers-checkboxes" class="d-flex flex-wrap gap-md">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Progress (%)</label>
+                        <input type="range" class="form-control" id="case-progress" min="0" max="100" value="0"
+                            style="padding: 0;">
+                        <div class="d-flex justify-content-between text-sm text-secondary mt-sm">
+                            <span>0%</span>
+                            <span id="progress-value">0%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Catatan</label>
+                        <textarea class="form-control" id="case-notes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="Utils.closeModal('case-modal')">Batal</button>
+                <button class="btn btn-primary" onclick="saveCase()">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        if (!Auth.isLoggedIn()) {
+            window.location.href = 'index.html';
+        }
+
+        let currentEditId = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initPage();
+            populateFormOptions();
+            renderCases();
+
+            if (Utils.getUrlParam('action') === 'new') {
+                openAddModal();
+            }
+
+            document.getElementById('search-input').addEventListener('input', Utils.debounce(renderCases, 300));
+            document.getElementById('filter-status').addEventListener('change', renderCases);
+            document.getElementById('filter-priority').addEventListener('change', renderCases);
+
+            document.getElementById('case-progress').addEventListener('input', function () {
+                document.getElementById('progress-value').textContent = this.value + '%';
+            });
+        });
+
+        function initPage() {
+            const user = Auth.getCurrentUser();
+            const firm = DataManager.getFirmProfile();
+
+            document.getElementById('sidebar-logo').src = firm.logo;
+            document.getElementById('sidebar-firm-name').textContent = firm.firmName;
+            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
+            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+            document.getElementById('header-user-name').textContent = user.fullName;
+            document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
+
+            updateStats();
+        }
+
+        function updateStats() {
+            const user = Auth.getCurrentUser();
+            let cases = DataManager.getCases();
+
+            if (!Auth.canViewAllCases()) {
+                cases = cases.filter(c => c.assignedLawyers && c.assignedLawyers.includes(user.id));
+            }
+
+            document.getElementById('stat-total').textContent = cases.length;
+            document.getElementById('stat-progress').textContent = cases.filter(c => c.status === 'in_progress').length;
+            document.getElementById('stat-pending').textContent = cases.filter(c => c.status === 'pending').length;
+            document.getElementById('stat-closed').textContent = cases.filter(c => c.status === 'closed').length;
+        }
+
+        function populateFormOptions() {
+            // Populate clients
+            const clientSelect = document.getElementById('case-client');
+            const clients = DataManager.getClients();
+            clients.forEach(c => {
+                clientSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+            });
+
+            // Populate lawyers
+            const lawyersDiv = document.getElementById('lawyers-checkboxes');
+            const lawyers = DataManager.getUsers().filter(u =>
+                ['owner', 'partner', 'senior', 'associate'].includes(u.role)
+            );
+            lawyersDiv.innerHTML = lawyers.map(l => `
+                <label class="custom-checkbox" style="min-width: 200px;">
+                    <input type="checkbox" name="lawyers" value="${l.id}">
+                    <span>${l.fullName}</span>
+                </label>
+            `).join('');
+        }
+
+        function renderCases() {
+            const user = Auth.getCurrentUser();
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const statusFilter = document.getElementById('filter-status').value;
+            const priorityFilter = document.getElementById('filter-priority').value;
+
+            let cases = DataManager.getCases();
+
+            // Filter based on role
+            if (!Auth.canViewAllCases()) {
+                cases = cases.filter(c => c.assignedLawyers && c.assignedLawyers.includes(user.id));
+            }
+
+            // Apply filters
+            if (search) {
+                cases = cases.filter(c =>
+                    c.caseNumber.toLowerCase().includes(search) ||
+                    c.title.toLowerCase().includes(search)
+                );
+            }
+            if (statusFilter) {
+                cases = cases.filter(c => c.status === statusFilter);
+            }
+            if (priorityFilter) {
+                cases = cases.filter(c => c.priority === priorityFilter);
+            }
+
+            // Sort by date
+            cases.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            const tbody = document.getElementById('cases-table');
+
+            if (cases.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center text-secondary p-xl">
+                            <i class="fas fa-briefcase" style="font-size: 2rem; display: block; margin-bottom: 1rem; color: var(--gray-300);"></i>
+                            Tidak ada kasus ditemukan
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = cases.map(c => {
+                const client = DataManager.getClientById(c.clientId);
+                const lawyers = (c.assignedLawyers || []).map(id => DataManager.getUserById(id)).filter(Boolean);
+                const daysUntil = Utils.daysUntil(c.deadline);
+                let deadlineClass = '';
+                if (c.status !== 'closed') {
+                    if (daysUntil < 0) deadlineClass = 'text-danger font-medium';
+                    else if (daysUntil <= 7) deadlineClass = 'text-warning';
+                }
+
+                return `
+                    <tr onclick="window.location.href='case-detail.html?id=${c.id}'" style="cursor: pointer;">
+                        <td><code>${c.caseNumber}</code></td>
+                        <td>
+                            <div class="font-medium">${Utils.truncate(c.title, 35)}</div>
+                            <div class="text-sm text-secondary">${c.caseType || 'General'}</div>
+                        </td>
+                        <td>${client?.name || '-'}</td>
+                        <td>
+                            <div class="avatar-group">
+                                ${lawyers.slice(0, 3).map(l => `
+                                    <div class="user-avatar avatar-sm" style="background: ${Utils.stringToColor(l.fullName)}" data-tooltip="${l.fullName}">
+                                        ${Utils.getInitials(l.fullName)}
+                                    </div>
+                                `).join('')}
+                                ${lawyers.length > 3 ? `<div class="user-avatar avatar-sm" style="background: var(--gray-400)">+${lawyers.length - 3}</div>` : ''}
+                            </div>
+                        </td>
+                        <td>${Utils.getStatusBadge(c.status)}</td>
+                        <td>${Utils.getPriorityBadge(c.priority)}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-sm">
+                                <div class="progress-bar" style="width: 60px;">
+                                    <div class="progress" style="width: ${c.progress}%"></div>
+                                </div>
+                                <span class="text-sm">${c.progress}%</span>
+                            </div>
+                        </td>
+                        <td class="${deadlineClass}">${Utils.formatDateShort(c.deadline)}</td>
+                        <td onclick="event.stopPropagation()">
+                            <div class="action-btns">
+                                <button class="icon-btn" onclick="editCase('${c.id}')" data-tooltip="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="icon-btn danger" onclick="deleteCase('${c.id}')" data-tooltip="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openAddModal() {
+            currentEditId = null;
+            document.getElementById('modal-title').textContent = 'Tambah Kasus Baru';
+            document.getElementById('case-form').reset();
+            document.getElementById('case-start').value = new Date().toISOString().split('T')[0];
+            document.getElementById('progress-value').textContent = '0%';
+
+            // Uncheck all lawyers
+            document.querySelectorAll('input[name="lawyers"]').forEach(cb => cb.checked = false);
+
+            Utils.openModal('case-modal');
+        }
+
+        function editCase(id) {
+            const caseData = DataManager.getCaseById(id);
+            if (!caseData) return;
+
+            currentEditId = id;
+            document.getElementById('modal-title').textContent = 'Edit Kasus';
+            document.getElementById('case-id').value = caseData.id;
+            document.getElementById('case-title').value = caseData.title;
+            document.getElementById('case-description').value = caseData.description || '';
+            document.getElementById('case-client').value = caseData.clientId;
+            document.getElementById('case-type').value = caseData.caseType || '';
+            document.getElementById('case-status').value = caseData.status;
+            document.getElementById('case-priority').value = caseData.priority;
+            document.getElementById('case-start').value = caseData.startDate;
+            document.getElementById('case-deadline').value = caseData.deadline;
+            document.getElementById('case-progress').value = caseData.progress || 0;
+            document.getElementById('progress-value').textContent = (caseData.progress || 0) + '%';
+            document.getElementById('case-notes').value = caseData.notes || '';
+
+            // Check assigned lawyers
+            document.querySelectorAll('input[name="lawyers"]').forEach(cb => {
+                cb.checked = (caseData.assignedLawyers || []).includes(cb.value);
+            });
+
+            Utils.openModal('case-modal');
+        }
+
+        function saveCase() {
+            const form = document.getElementById('case-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const user = Auth.getCurrentUser();
+            const assignedLawyers = Array.from(document.querySelectorAll('input[name="lawyers"]:checked')).map(cb => cb.value);
+
+            const caseData = {
+                title: document.getElementById('case-title').value.trim(),
+                description: document.getElementById('case-description').value.trim(),
+                clientId: document.getElementById('case-client').value,
+                caseType: document.getElementById('case-type').value,
+                status: document.getElementById('case-status').value,
+                priority: document.getElementById('case-priority').value,
+                startDate: document.getElementById('case-start').value,
+                deadline: document.getElementById('case-deadline').value,
+                progress: parseInt(document.getElementById('case-progress').value),
+                notes: document.getElementById('case-notes').value.trim(),
+                assignedLawyers: assignedLawyers
+            };
+
+            if (currentEditId) {
+                DataManager.updateCase(currentEditId, caseData);
+                Utils.showToast('Kasus berhasil diperbarui', 'success');
+            } else {
+                caseData.createdBy = user.id;
+                DataManager.addCase(caseData);
+                Utils.showToast('Kasus berhasil ditambahkan', 'success');
+            }
+
+            Utils.closeModal('case-modal');
+            updateStats();
+            renderCases();
+        }
+
+        async function deleteCase(id) {
+            const caseData = DataManager.getCaseById(id);
+            if (!caseData) return;
+
+            const confirmed = await Utils.confirm(
+                `Apakah Anda yakin ingin menghapus kasus "${caseData.caseNumber}"?`,
+                'Hapus Kasus'
+            );
+
+            if (confirmed) {
+                DataManager.deleteCase(id);
+                Utils.showToast('Kasus berhasil dihapus', 'success');
+                updateStats();
+                renderCases();
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Also and Partners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Logo" class="sidebar-logo" id="sidebar-logo">
+                <div class="sidebar-brand">
+                    <h2 id="sidebar-firm-name">Also and Partners</h2>
+                    <p>Advocates & Legal Consultants</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-menu-toggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <h1>User Management</h1>
+                </div>
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="notification-btn" onclick="App.toggleTheme()">
+                            <i id="theme-icon" class="fas fa-moon"></i>
+                        </button>
+                        <div class="dropdown">
+                            <div class="user-menu dropdown-trigger">
+                                <div class="user-avatar" id="header-avatar"></div>
+                                <div class="user-info">
+                                    <h4 id="header-user-name">User</h4>
+                                    <p id="header-user-role">Role</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                                    <i class="fas fa-user"></i><span>Profile</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="Auth.logout()">
+                                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <!-- Filter Bar -->
+                <div class="card mb-lg">
+                    <div class="card-body">
+                        <div class="filter-bar">
+                            <div class="search-input" style="flex: 1;">
+                                <div class="header-search" style="width: 100%;">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" id="search-input" placeholder="Cari user..."
+                                        style="width: 100%;">
+                                </div>
+                            </div>
+                            <select class="form-control" id="filter-role" style="width: 180px;">
+                                <option value="">Semua Role</option>
+                                <option value="superadmin">Super Admin</option>
+                                <option value="owner">Partners Owner</option>
+                                <option value="partner">Partners</option>
+                                <option value="senior">Senior Associate</option>
+                                <option value="associate">Associate</option>
+                                <option value="paralegal">Paralegal</option>
+                            </select>
+                            <select class="form-control" id="filter-status" style="width: 150px;">
+                                <option value="">Semua Status</option>
+                                <option value="active">Aktif</option>
+                                <option value="inactive">Tidak Aktif</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="openAddModal()">
+                                <i class="fas fa-plus"></i> Tambah User
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Tanggal Dibuat</th>
+                                        <th style="width: 100px;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit User Modal -->
+    <div class="modal-overlay" id="user-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Tambah User Baru</h3>
+                <button class="modal-close" onclick="Utils.closeModal('user-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="user-form">
+                    <input type="hidden" id="user-id">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Nama Lengkap</label>
+                            <input type="text" class="form-control" id="user-fullname" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Username</label>
+                            <input type="text" class="form-control" id="user-username" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Email</label>
+                            <input type="email" class="form-control" id="user-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Phone</label>
+                            <input type="tel" class="form-control" id="user-phone" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Role</label>
+                            <select class="form-control" id="user-role" required>
+                                <option value="">Pilih Role</option>
+                                <option value="owner">Partners Owner</option>
+                                <option value="partner">Partners</option>
+                                <option value="senior">Senior Associate</option>
+                                <option value="associate">Associate</option>
+                                <option value="paralegal">Paralegal</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required" id="password-label">Password</label>
+                            <input type="password" class="form-control" id="user-password">
+                            <p class="form-hint" id="password-hint">Minimal 6 karakter</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="user-active" checked>
+                            <span>User Aktif</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="Utils.closeModal('user-modal')">Batal</button>
+                <button class="btn btn-primary" onclick="saveUser()">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Check auth and role
+        if (!Auth.isLoggedIn()) {
+            window.location.href = 'index.html';
+        }
+        if (!Auth.canManageUsers()) {
+            window.location.href = 'dashboard.html';
+        }
+
+        let currentEditId = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initPage();
+            renderUsers();
+
+            // Search and filter handlers
+            document.getElementById('search-input').addEventListener('input', Utils.debounce(renderUsers, 300));
+            document.getElementById('filter-role').addEventListener('change', renderUsers);
+            document.getElementById('filter-status').addEventListener('change', renderUsers);
+        });
+
+        function initPage() {
+            const user = Auth.getCurrentUser();
+            const firm = DataManager.getFirmProfile();
+
+            document.getElementById('sidebar-logo').src = firm.logo;
+            document.getElementById('sidebar-firm-name').textContent = firm.firmName;
+            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
+            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+            document.getElementById('header-user-name').textContent = user.fullName;
+            document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
+        }
+
+        function renderUsers() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const roleFilter = document.getElementById('filter-role').value;
+            const statusFilter = document.getElementById('filter-status').value;
+
+            let users = DataManager.getUsers();
+
+            // Apply filters
+            if (search) {
+                users = users.filter(u =>
+                    u.fullName.toLowerCase().includes(search) ||
+                    u.username.toLowerCase().includes(search) ||
+                    u.email.toLowerCase().includes(search)
+                );
+            }
+            if (roleFilter) {
+                users = users.filter(u => u.role === roleFilter);
+            }
+            if (statusFilter) {
+                const isActive = statusFilter === 'active';
+                users = users.filter(u => u.isActive === isActive);
+            }
+
+            const tbody = document.getElementById('users-table');
+
+            if (users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-secondary p-xl">
+                            <i class="fas fa-users" style="font-size: 2rem; display: block; margin-bottom: 1rem; color: var(--gray-300);"></i>
+                            Tidak ada user ditemukan
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => {
+                const roleInfo = Auth.getRoleInfo(user.role);
+                return `
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-md">
+                                <div class="user-avatar" style="background: ${Utils.stringToColor(user.fullName)}">
+                                    ${Utils.getInitials(user.fullName)}
+                                </div>
+                                <div>
+                                    <div class="font-medium">${user.fullName}</div>
+                                    <div class="text-sm text-secondary">${user.phone || '-'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><code>${user.username}</code></td>
+                        <td>${user.email}</td>
+                        <td>
+                            <span class="badge" style="background: ${roleInfo?.color}20; color: ${roleInfo?.color}">
+                                ${Auth.getRoleLabel(user.role)}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-dot ${user.isActive ? 'active' : 'inactive'}">
+                                ${user.isActive ? 'Aktif' : 'Tidak Aktif'}
+                            </span>
+                        </td>
+                        <td>${Utils.formatDateShort(user.createdAt)}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="icon-btn" onclick="editUser('${user.id}')" data-tooltip="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                ${user.role !== 'superadmin' ? `
+                                    <button class="icon-btn danger" onclick="deleteUser('${user.id}')" data-tooltip="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openAddModal() {
+            currentEditId = null;
+            document.getElementById('modal-title').textContent = 'Tambah User Baru';
+            document.getElementById('user-form').reset();
+            document.getElementById('user-active').checked = true;
+            document.getElementById('user-password').required = true;
+            document.getElementById('password-label').classList.add('required');
+            document.getElementById('password-hint').textContent = 'Minimal 6 karakter';
+            Utils.openModal('user-modal');
+        }
+
+        function editUser(id) {
+            const user = DataManager.getUserById(id);
+            if (!user) return;
+
+            currentEditId = id;
+            document.getElementById('modal-title').textContent = 'Edit User';
+            document.getElementById('user-id').value = user.id;
+            document.getElementById('user-fullname').value = user.fullName;
+            document.getElementById('user-username').value = user.username;
+            document.getElementById('user-email').value = user.email;
+            document.getElementById('user-phone').value = user.phone || '';
+            document.getElementById('user-role').value = user.role;
+            document.getElementById('user-password').value = '';
+            document.getElementById('user-password').required = false;
+            document.getElementById('password-label').classList.remove('required');
+            document.getElementById('password-hint').textContent = 'Kosongkan jika tidak ingin mengubah password';
+            document.getElementById('user-active').checked = user.isActive;
+
+            Utils.openModal('user-modal');
+        }
+
+        function saveUser() {
+            const form = document.getElementById('user-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const userData = {
+                fullName: document.getElementById('user-fullname').value.trim(),
+                username: document.getElementById('user-username').value.trim(),
+                email: document.getElementById('user-email').value.trim(),
+                phone: document.getElementById('user-phone').value.trim(),
+                role: document.getElementById('user-role').value,
+                isActive: document.getElementById('user-active').checked
+            };
+
+            const password = document.getElementById('user-password').value;
+
+            // Validate password for new user
+            if (!currentEditId && password.length < 6) {
+                Utils.showToast('Password minimal 6 karakter', 'error');
+                return;
+            }
+
+            // Check username uniqueness
+            const users = DataManager.getUsers();
+            const existingUser = users.find(u =>
+                u.username === userData.username && u.id !== currentEditId
+            );
+            if (existingUser) {
+                Utils.showToast('Username sudah digunakan', 'error');
+                return;
+            }
+
+            if (currentEditId) {
+                // Update existing user
+                if (password) {
+                    userData.password = password;
+                }
+                DataManager.updateUser(currentEditId, userData);
+                Utils.showToast('User berhasil diperbarui', 'success');
+            } else {
+                // Add new user
+                userData.password = password;
+                DataManager.addUser(userData);
+                Utils.showToast('User berhasil ditambahkan', 'success');
+            }
+
+            Utils.closeModal('user-modal');
+            renderUsers();
+        }
+
+        async function deleteUser(id) {
+            const user = DataManager.getUserById(id);
+            if (!user) return;
+
+            const confirmed = await Utils.confirm(
+                `Apakah Anda yakin ingin menghapus user "${user.fullName}"?`,
+                'Hapus User'
+            );
+
+            if (confirmed) {
+                DataManager.deleteUser(id);
+                Utils.showToast('User berhasil dihapus', 'success');
+                renderUsers();
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoices - Also and Partners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Logo" class="sidebar-logo" id="sidebar-logo">
+                <div class="sidebar-brand">
+                    <h2 id="sidebar-firm-name">Also and Partners</h2>
+                    <p>Advocates & Legal Consultants</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-menu-toggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <h1>Invoices</h1>
+                </div>
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="notification-btn" onclick="App.toggleTheme()">
+                            <i id="theme-icon" class="fas fa-moon"></i>
+                        </button>
+                        <div class="dropdown">
+                            <div class="user-menu dropdown-trigger">
+                                <div class="user-avatar" id="header-avatar"></div>
+                                <div class="user-info">
+                                    <h4 id="header-user-name">User</h4>
+                                    <p id="header-user-role">Role</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                                    <i class="fas fa-user"></i><span>Profile</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="Auth.logout()">
+                                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <!-- Statistics -->
+                <div class="stats-grid mb-xl">
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <div class="stat-content">
+                            <h4>Total Invoice</h4>
+                            <div class="stat-value" id="stat-total">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-content">
+                            <h4>Terbayar</h4>
+                            <div class="stat-value" id="stat-paid">Rp 0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon gold"><i class="fas fa-hourglass-half"></i></div>
+                        <div class="stat-content">
+                            <h4>Pending</h4>
+                            <div class="stat-value" id="stat-pending">Rp 0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="fas fa-exclamation-circle"></i></div>
+                        <div class="stat-content">
+                            <h4>Overdue</h4>
+                            <div class="stat-value" id="stat-overdue">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="card mb-lg">
+                    <div class="card-body">
+                        <div class="filter-bar">
+                            <div class="header-search" style="flex: 1;">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-input" placeholder="Cari invoice..." style="width: 100%;">
+                            </div>
+                            <select class="form-control" id="filter-status" style="width: 150px;">
+                                <option value="">Semua Status</option>
+                                <option value="unpaid">Unpaid</option>
+                                <option value="partial">Partial</option>
+                                <option value="paid">Paid</option>
+                            </select>
+                            <select class="form-control" id="filter-client" style="width: 180px;">
+                                <option value="">Semua Klien</option>
+                            </select>
+                            <a href="invoice-create.html" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Buat Invoice
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoices Table -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>No. Invoice</th>
+                                        <th>Klien</th>
+                                        <th>Kasus</th>
+                                        <th>Tanggal</th>
+                                        <th>Jatuh Tempo</th>
+                                        <th>Jumlah</th>
+                                        <th>Terbayar</th>
+                                        <th>Status</th>
+                                        <th style="width: 120px;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoices-table">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="payment-modal">
+        <div class="modal" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Catat Pembayaran</h3>
+                <button class="modal-close" onclick="Utils.closeModal('payment-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="payment-info" class="mb-lg p-md rounded" style="background: var(--bg-tertiary);">
+                    <!-- Populated by JS -->
+                </div>
+                <form id="payment-form">
+                    <input type="hidden" id="payment-invoice-id">
+
+                    <div class="form-group">
+                        <label class="form-label required">Jumlah Pembayaran</label>
+                        <input type="number" class="form-control" id="payment-amount" required min="1">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Tanggal</label>
+                            <input type="date" class="form-control" id="payment-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Metode</label>
+                            <select class="form-control" id="payment-method" required>
+                                <option value="transfer">Transfer Bank</option>
+                                <option value="cash">Cash</option>
+                                <option value="check">Check</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">No. Referensi</label>
+                        <input type="text" class="form-control" id="payment-reference" placeholder="Contoh: TRF123456">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Catatan</label>
+                        <textarea class="form-control" id="payment-notes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="Utils.closeModal('payment-modal')">Batal</button>
+                <button class="btn btn-success" onclick="savePayment()">
+                    <i class="fas fa-check"></i> Simpan Pembayaran
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        if (!Auth.isLoggedIn()) {
+            window.location.href = 'index.html';
+        }
+        if (!Auth.canManageInvoices()) {
+            window.location.href = 'dashboard.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initPage();
+            populateClients();
+            updateStats();
+            renderInvoices();
+
+            document.getElementById('search-input').addEventListener('input', Utils.debounce(renderInvoices, 300));
+            document.getElementById('filter-status').addEventListener('change', renderInvoices);
+            document.getElementById('filter-client').addEventListener('change', renderInvoices);
+        });
+
+        function initPage() {
+            const user = Auth.getCurrentUser();
+            const firm = DataManager.getFirmProfile();
+
+            document.getElementById('sidebar-logo').src = firm.logo;
+            document.getElementById('sidebar-firm-name').textContent = firm.firmName;
+            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
+            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+            document.getElementById('header-user-name').textContent = user.fullName;
+            document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
+        }
+
+        function populateClients() {
+            const clients = DataManager.getClients();
+            const select = document.getElementById('filter-client');
+            clients.forEach(c => {
+                select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+            });
+        }
+
+        function updateStats() {
+            const invoices = DataManager.getInvoices();
+            const now = new Date();
+
+            const totalPaid = invoices.reduce((sum, i) => sum + (i.paidAmount || 0), 0);
+            const totalPending = invoices.reduce((sum, i) => sum + (i.totalAmount - (i.paidAmount || 0)), 0);
+            const overdue = invoices.filter(i => i.status !== 'paid' && new Date(i.dueDate) < now).length;
+
+            document.getElementById('stat-total').textContent = invoices.length;
+            document.getElementById('stat-paid').textContent = Utils.formatCurrency(totalPaid);
+            document.getElementById('stat-pending').textContent = Utils.formatCurrency(totalPending);
+            document.getElementById('stat-overdue').textContent = overdue;
+        }
+
+        function renderInvoices() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const statusFilter = document.getElementById('filter-status').value;
+            const clientFilter = document.getElementById('filter-client').value;
+
+            let invoices = DataManager.getInvoices();
+
+            if (search) {
+                invoices = invoices.filter(i =>
+                    i.invoiceNumber.toLowerCase().includes(search)
+                );
+            }
+            if (statusFilter) {
+                invoices = invoices.filter(i => i.status === statusFilter);
+            }
+            if (clientFilter) {
+                invoices = invoices.filter(i => i.clientId === clientFilter);
+            }
+
+            invoices.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            const tbody = document.getElementById('invoices-table');
+
+            if (invoices.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center text-secondary p-xl">
+                            <i class="fas fa-file-invoice-dollar" style="font-size: 2rem; display: block; margin-bottom: 1rem; color: var(--gray-300);"></i>
+                            Tidak ada invoice ditemukan
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = invoices.map(inv => {
+                const client = DataManager.getClientById(inv.clientId);
+                const caseData = inv.caseId ? DataManager.getCaseById(inv.caseId) : null;
+                const daysUntil = Utils.daysUntil(inv.dueDate);
+                let dueDateClass = '';
+                if (inv.status !== 'paid') {
+                    if (daysUntil < 0) dueDateClass = 'text-danger font-medium';
+                    else if (daysUntil <= 7) dueDateClass = 'text-warning';
+                }
+
+                const remaining = inv.totalAmount - (inv.paidAmount || 0);
+
+                return `
+                    <tr>
+                        <td>
+                            <a href="invoice-print.html?id=${inv.id}" class="font-medium">${inv.invoiceNumber}</a>
+                        </td>
+                        <td>${client?.name || '-'}</td>
+                        <td>${caseData ? `<a href="case-detail.html?id=${caseData.id}">${caseData.caseNumber}</a>` : '-'}</td>
+                        <td>${Utils.formatDateShort(inv.issueDate)}</td>
+                        <td class="${dueDateClass}">${Utils.formatDateShort(inv.dueDate)}</td>
+                        <td class="font-medium">${Utils.formatCurrency(inv.totalAmount)}</td>
+                        <td>
+                            ${inv.paidAmount > 0 ? Utils.formatCurrency(inv.paidAmount) : '-'}
+                            ${remaining > 0 && inv.paidAmount > 0 ? `<div class="text-sm text-secondary">Sisa: ${Utils.formatCurrency(remaining)}</div>` : ''}
+                        </td>
+                        <td>${Utils.getStatusBadge(inv.status)}</td>
+                        <td>
+                            <div class="action-btns">
+                                <a href="invoice-print.html?id=${inv.id}" class="icon-btn" data-tooltip="Lihat">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                ${inv.status !== 'paid' ? `
+                                    <button class="icon-btn" onclick="openPaymentModal('${inv.id}')" data-tooltip="Bayar">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </button>
+                                ` : ''}
+                                <button class="icon-btn danger" onclick="deleteInvoice('${inv.id}')" data-tooltip="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openPaymentModal(id) {
+            const invoice = DataManager.getInvoiceById(id);
+            if (!invoice) return;
+
+            const remaining = invoice.totalAmount - (invoice.paidAmount || 0);
+            const client = DataManager.getClientById(invoice.clientId);
+
+            document.getElementById('payment-invoice-id').value = id;
+            document.getElementById('payment-amount').value = '';
+            document.getElementById('payment-amount').max = remaining;
+            document.getElementById('payment-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('payment-reference').value = '';
+            document.getElementById('payment-notes').value = '';
+
+            document.getElementById('payment-info').innerHTML = `
+                <div class="d-flex justify-content-between mb-sm">
+                    <span class="text-secondary">Invoice:</span>
+                    <strong>${invoice.invoiceNumber}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-sm">
+                    <span class="text-secondary">Klien:</span>
+                    <span>${client?.name || '-'}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-sm">
+                    <span class="text-secondary">Total:</span>
+                    <span>${Utils.formatCurrency(invoice.totalAmount)}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-sm">
+                    <span class="text-secondary">Terbayar:</span>
+                    <span class="text-success">${Utils.formatCurrency(invoice.paidAmount || 0)}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-secondary">Sisa:</span>
+                    <strong class="text-danger">${Utils.formatCurrency(remaining)}</strong>
+                </div>
+            `;
+
+            Utils.openModal('payment-modal');
+        }
+
+        function savePayment() {
+            const form = document.getElementById('payment-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const invoiceId = document.getElementById('payment-invoice-id').value;
+            const invoice = DataManager.getInvoiceById(invoiceId);
+            if (!invoice) return;
+
+            const amount = parseFloat(document.getElementById('payment-amount').value);
+            const remaining = invoice.totalAmount - (invoice.paidAmount || 0);
+
+            if (amount > remaining) {
+                Utils.showToast('Jumlah pembayaran melebihi sisa tagihan', 'error');
+                return;
+            }
+
+            const user = Auth.getCurrentUser();
+            DataManager.addPayment({
+                invoiceId: invoiceId,
+                amount: amount,
+                paymentDate: document.getElementById('payment-date').value,
+                paymentMethod: document.getElementById('payment-method').value,
+                referenceNumber: document.getElementById('payment-reference').value.trim(),
+                notes: document.getElementById('payment-notes').value.trim(),
+                receivedBy: user.id
+            });
+
+            Utils.closeModal('payment-modal');
+            Utils.showToast('Pembayaran berhasil dicatat', 'success');
+            updateStats();
+            renderInvoices();
+        }
+
+        async function deleteInvoice(id) {
+            const invoice = DataManager.getInvoiceById(id);
+            if (!invoice) return;
+
+            const confirmed = await Utils.confirm(
+                `Apakah Anda yakin ingin menghapus invoice "${invoice.invoiceNumber}"?`,
+                'Hapus Invoice'
+            );
+
+            if (confirmed) {
+                DataManager.deleteInvoice(id);
+                Utils.showToast('Invoice berhasil dihapus', 'success');
+                updateStats();
+                renderInvoices();
+            }
+        }
+    </script>
+</body>
+
+</html>

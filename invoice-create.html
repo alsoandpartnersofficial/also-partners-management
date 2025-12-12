@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buat Invoice - Also and Partners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Logo" class="sidebar-logo" id="sidebar-logo">
+                <div class="sidebar-brand">
+                    <h2 id="sidebar-firm-name">Also and Partners</h2>
+                    <p>Advocates & Legal Consultants</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-menu-toggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <a href="invoices.html" class="btn btn-secondary btn-sm mr-md">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </a>
+                    <h1 id="page-title">Buat Invoice Baru</h1>
+                </div>
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="notification-btn" onclick="App.toggleTheme()">
+                            <i id="theme-icon" class="fas fa-moon"></i>
+                        </button>
+                        <div class="dropdown">
+                            <div class="user-menu dropdown-trigger">
+                                <div class="user-avatar" id="header-avatar"></div>
+                                <div class="user-info">
+                                    <h4 id="header-user-name">User</h4>
+                                    <p id="header-user-role">Role</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                                    <i class="fas fa-user"></i><span>Profile</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="Auth.logout()">
+                                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <form id="invoice-form">
+                    <div class="d-grid gap-lg" style="grid-template-columns: 2fr 1fr;">
+                        <!-- Left Column - Invoice Items -->
+                        <div>
+                            <div class="card mb-lg">
+                                <div class="card-header">
+                                    <h3><i class="fas fa-user mr-sm"></i> Informasi Klien</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label required">Klien</label>
+                                            <select class="form-control" id="invoice-client" required
+                                                onchange="loadClientCases()">
+                                                <option value="">Pilih Klien</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Kasus Terkait</label>
+                                            <select class="form-control" id="invoice-case">
+                                                <option value="">Tidak ada</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card mb-lg">
+                                <div class="card-header">
+                                    <h3><i class="fas fa-list mr-sm"></i> Item Layanan</h3>
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="addItem()">
+                                        <i class="fas fa-plus"></i> Tambah Item
+                                    </button>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-container">
+                                        <table class="data-table">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 40%;">Deskripsi</th>
+                                                    <th style="width: 10%;">Qty</th>
+                                                    <th style="width: 15%;">Satuan</th>
+                                                    <th style="width: 20%;">Harga</th>
+                                                    <th style="width: 15%;">Subtotal</th>
+                                                    <th style="width: 50px;"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="items-table">
+                                                <!-- Items populated by JS -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3><i class="fas fa-sticky-note mr-sm"></i> Catatan</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group mb-0">
+                                        <label class="form-label">Catatan untuk Klien</label>
+                                        <textarea class="form-control" id="invoice-notes" rows="3"
+                                            placeholder="Informasi pembayaran, catatan tambahan, dll."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column - Summary -->
+                        <div>
+                            <div class="card mb-lg">
+                                <div class="card-header">
+                                    <h3><i class="fas fa-calendar mr-sm"></i> Tanggal</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label class="form-label required">Tanggal Invoice</label>
+                                        <input type="date" class="form-control" id="invoice-date" required>
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label required">Jatuh Tempo</label>
+                                        <input type="date" class="form-control" id="invoice-due" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card mb-lg">
+                                <div class="card-header">
+                                    <h3><i class="fas fa-calculator mr-sm"></i> Total</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between mb-md">
+                                        <span class="text-secondary">Subtotal</span>
+                                        <span id="summary-subtotal">Rp 0</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-md">
+                                        <div class="d-flex align-items-center gap-sm">
+                                            <input type="checkbox" id="apply-tax" checked onchange="calculateTotal()">
+                                            <label for="apply-tax" class="text-secondary m-0">PPN</label>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-sm">
+                                            <input type="number" class="form-control" id="tax-rate" value="11"
+                                                style="width: 60px; padding: 0.25rem 0.5rem; text-align: center;"
+                                                onchange="calculateTotal()">
+                                            <span>%</span>
+                                            <span id="summary-tax">Rp 0</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-lg">
+                                        <span class="text-secondary">Diskon</span>
+                                        <div class="d-flex align-items-center gap-sm">
+                                            <span>Rp</span>
+                                            <input type="number" class="form-control" id="discount" value="0"
+                                                style="width: 100px; padding: 0.25rem 0.5rem;"
+                                                onchange="calculateTotal()">
+                                        </div>
+                                    </div>
+
+                                    <div class="divider"></div>
+
+                                    <div class="d-flex justify-content-between">
+                                        <strong style="font-size: 1.125rem;">TOTAL</strong>
+                                        <strong style="font-size: 1.25rem; color: var(--primary-navy);"
+                                            id="summary-total">Rp 0</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-column gap-sm">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Simpan Invoice
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="previewInvoice()">
+                                    <i class="fas fa-eye"></i> Preview
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        if (!Auth.isLoggedIn()) {
+            window.location.href = 'index.html';
+        }
+        if (!Auth.canManageInvoices()) {
+            window.location.href = 'dashboard.html';
+        }
+
+        let items = [];
+        let editMode = false;
+        let editId = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initPage();
+            populateClients();
+
+            // Set default dates
+            const today = new Date();
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + 30);
+
+            document.getElementById('invoice-date').value = today.toISOString().split('T')[0];
+            document.getElementById('invoice-due').value = dueDate.toISOString().split('T')[0];
+
+            // Add initial item
+            addItem();
+
+            // Check if editing
+            editId = Utils.getUrlParam('edit');
+            if (editId) {
+                loadInvoiceForEdit(editId);
+            }
+
+            // Form submission
+            document.getElementById('invoice-form').addEventListener('submit', saveInvoice);
+        });
+
+        function initPage() {
+            const user = Auth.getCurrentUser();
+            const firm = DataManager.getFirmProfile();
+
+            document.getElementById('sidebar-logo').src = firm.logo;
+            document.getElementById('sidebar-firm-name').textContent = firm.firmName;
+            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
+            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+            document.getElementById('header-user-name').textContent = user.fullName;
+            document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
+        }
+
+        function populateClients() {
+            const clients = DataManager.getClients();
+            const select = document.getElementById('invoice-client');
+            clients.forEach(c => {
+                select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+            });
+        }
+
+        function loadClientCases() {
+            const clientId = document.getElementById('invoice-client').value;
+            const caseSelect = document.getElementById('invoice-case');
+            caseSelect.innerHTML = '<option value="">Tidak ada</option>';
+
+            if (clientId) {
+                const cases = DataManager.getCases().filter(c => c.clientId === clientId);
+                cases.forEach(c => {
+                    caseSelect.innerHTML += `<option value="${c.id}">${c.caseNumber} - ${Utils.truncate(c.title, 25)}</option>`;
+                });
+            }
+        }
+
+        function loadInvoiceForEdit(id) {
+            const invoice = DataManager.getInvoiceById(id);
+            if (!invoice) {
+                window.location.href = 'invoices.html';
+                return;
+            }
+
+            editMode = true;
+            document.getElementById('page-title').textContent = 'Edit Invoice';
+
+            document.getElementById('invoice-client').value = invoice.clientId;
+            loadClientCases();
+            document.getElementById('invoice-case').value = invoice.caseId || '';
+            document.getElementById('invoice-date').value = invoice.issueDate;
+            document.getElementById('invoice-due').value = invoice.dueDate;
+            document.getElementById('tax-rate').value = invoice.taxRate || 11;
+            document.getElementById('apply-tax').checked = invoice.taxRate > 0;
+            document.getElementById('discount').value = invoice.discount || 0;
+            document.getElementById('invoice-notes').value = invoice.notes || '';
+
+            items = invoice.items || [];
+            renderItems();
+        }
+
+        function addItem() {
+            items.push({
+                id: Date.now(),
+                description: '',
+                quantity: 1,
+                unit: 'layanan',
+                unitPrice: 0,
+                amount: 0
+            });
+            renderItems();
+        }
+
+        function removeItem(id) {
+            items = items.filter(item => item.id !== id);
+            if (items.length === 0) addItem();
+            renderItems();
+        }
+
+        function updateItem(id, field, value) {
+            const item = items.find(i => i.id === id);
+            if (item) {
+                if (field === 'quantity' || field === 'unitPrice') {
+                    value = parseFloat(value) || 0;
+                }
+                item[field] = value;
+                item.amount = item.quantity * item.unitPrice;
+            }
+            renderItems();
+        }
+
+        function renderItems() {
+            const tbody = document.getElementById('items-table');
+
+            tbody.innerHTML = items.map(item => `
+                <tr>
+                    <td>
+                        <input type="text" class="form-control" value="${item.description}" 
+                               onchange="updateItem(${item.id}, 'description', this.value)"
+                               placeholder="Deskripsi layanan" required>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control" value="${item.quantity}" min="1"
+                               onchange="updateItem(${item.id}, 'quantity', this.value)"
+                               style="text-align: center;">
+                    </td>
+                    <td>
+                        <select class="form-control" onchange="updateItem(${item.id}, 'unit', this.value)">
+                            <option value="layanan" ${item.unit === 'layanan' ? 'selected' : ''}>Layanan</option>
+                            <option value="jam" ${item.unit === 'jam' ? 'selected' : ''}>Jam</option>
+                            <option value="dokumen" ${item.unit === 'dokumen' ? 'selected' : ''}>Dokumen</option>
+                            <option value="hari" ${item.unit === 'hari' ? 'selected' : ''}>Hari</option>
+                            <option value="unit" ${item.unit === 'unit' ? 'selected' : ''}>Unit</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control" value="${item.unitPrice}" min="0"
+                               onchange="updateItem(${item.id}, 'unitPrice', this.value)"
+                               placeholder="0">
+                    </td>
+                    <td class="font-medium">
+                        ${Utils.formatCurrency(item.amount)}
+                    </td>
+                    <td>
+                        <button type="button" class="icon-btn danger" onclick="removeItem(${item.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
+            const applyTax = document.getElementById('apply-tax').checked;
+            const taxRate = applyTax ? parseFloat(document.getElementById('tax-rate').value) || 0 : 0;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+
+            const taxAmount = subtotal * (taxRate / 100);
+            const total = subtotal + taxAmount - discount;
+
+            document.getElementById('summary-subtotal').textContent = Utils.formatCurrency(subtotal);
+            document.getElementById('summary-tax').textContent = Utils.formatCurrency(taxAmount);
+            document.getElementById('summary-total').textContent = Utils.formatCurrency(total);
+        }
+
+        function saveInvoice(e) {
+            e.preventDefault();
+
+            // Validate items
+            const validItems = items.filter(i => i.description && i.quantity > 0 && i.unitPrice > 0);
+            if (validItems.length === 0) {
+                Utils.showToast('Tambahkan minimal satu item layanan', 'error');
+                return;
+            }
+
+            const subtotal = validItems.reduce((sum, item) => sum + item.amount, 0);
+            const applyTax = document.getElementById('apply-tax').checked;
+            const taxRate = applyTax ? parseFloat(document.getElementById('tax-rate').value) || 0 : 0;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            const taxAmount = subtotal * (taxRate / 100);
+            const total = subtotal + taxAmount - discount;
+
+            const user = Auth.getCurrentUser();
+            const invoiceData = {
+                clientId: document.getElementById('invoice-client').value,
+                caseId: document.getElementById('invoice-case').value || null,
+                issueDate: document.getElementById('invoice-date').value,
+                dueDate: document.getElementById('invoice-due').value,
+                items: validItems.map(i => ({
+                    description: i.description,
+                    quantity: i.quantity,
+                    unit: i.unit,
+                    unitPrice: i.unitPrice,
+                    amount: i.amount
+                })),
+                subtotal: subtotal,
+                taxRate: taxRate,
+                taxAmount: taxAmount,
+                discount: discount,
+                totalAmount: total,
+                status: 'unpaid',
+                paidAmount: 0,
+                notes: document.getElementById('invoice-notes').value.trim(),
+                terms: 'Pembayaran dalam 30 hari dari tanggal invoice.',
+                createdBy: user.id
+            };
+
+            if (editMode && editId) {
+                const existingInvoice = DataManager.getInvoiceById(editId);
+                invoiceData.status = existingInvoice.status;
+                invoiceData.paidAmount = existingInvoice.paidAmount;
+                DataManager.updateInvoice(editId, invoiceData);
+                Utils.showToast('Invoice berhasil diperbarui', 'success');
+            } else {
+                const newInvoice = DataManager.addInvoice(invoiceData);
+                Utils.showToast('Invoice berhasil dibuat', 'success');
+                editId = newInvoice.id;
+            }
+
+            setTimeout(() => {
+                window.location.href = `invoice-print.html?id=${editId}`;
+            }, 500);
+        }
+
+        function previewInvoice() {
+            // Save to temporary storage for preview
+            const validItems = items.filter(i => i.description && i.quantity > 0);
+
+            const subtotal = validItems.reduce((sum, item) => sum + item.amount, 0);
+            const applyTax = document.getElementById('apply-tax').checked;
+            const taxRate = applyTax ? parseFloat(document.getElementById('tax-rate').value) || 0 : 0;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            const taxAmount = subtotal * (taxRate / 100);
+            const total = subtotal + taxAmount - discount;
+
+            const previewData = {
+                clientId: document.getElementById('invoice-client').value,
+                caseId: document.getElementById('invoice-case').value || null,
+                issueDate: document.getElementById('invoice-date').value,
+                dueDate: document.getElementById('invoice-due').value,
+                items: validItems,
+                subtotal: subtotal,
+                taxRate: taxRate,
+                taxAmount: taxAmount,
+                discount: discount,
+                totalAmount: total,
+                notes: document.getElementById('invoice-notes').value.trim(),
+                invoiceNumber: 'PREVIEW'
+            };
+
+            localStorage.setItem('invoice_preview', JSON.stringify(previewData));
+            window.open('invoice-print.html?preview=true', '_blank');
+        }
+    </script>
+</body>
+
+</html>

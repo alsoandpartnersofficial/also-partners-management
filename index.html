@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Also and Partners - Law Firm Management System">
+    <title>Login - Also and Partners</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iMTIiIGZpbGw9IiMxRTNBNUYiLz4KPHBhdGggZD0iTTI1IDc1VjMwTDUwIDIwTDc1IDMwVjc1IiBzdHJva2U9IiNENEFGMzciIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxwYXRoIGQ9Ik01MCAyMFY1NSIgc3Ryb2tlPSIjRDRBRjM3IiBzdHJva2Utd2lkdGg9IjQiLz4KPGNpcmNsZSBjeD0iNTAiIGN5PSI2NSIgcj0iOCIgZmlsbD0iI0Q0QUYzNyIvPgo8L3N2Zz4K">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iMTIiIGZpbGw9IiMxRTNBNUYiLz4KPHBhdGggZD0iTTI1IDc1VjMwTDUwIDIwTDc1IDMwVjc1IiBzdHJva2U9IiNENEFGMzciIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxwYXRoIGQ9Ik01MCAyMFY1NSIgc3Ryb2tlPSIjRDRBRjM3IiBzdHJva2Utd2lkdGg9IjQiLz4KPGNpcmNsZSBjeD0iNTAiIGN5PSI2NSIgcj0iOCIgZmlsbD0iI0Q0QUYzNyIvPgo8L3N2Zz4K" alt="Also and Partners Logo" id="login-logo">
+                <h1>Also and Partners</h1>
+                <p>Advocates & Legal Consultants</p>
+            </div>
+            
+            <form class="login-form" id="login-form">
+                <div id="login-error" class="alert alert-danger" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="error-message"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Masukkan username" required autofocus>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Masukkan password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="custom-checkbox">
+                        <input type="checkbox" id="remember">
+                        <span>Ingat saya</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Masuk</span>
+                </button>
+            </form>
+            
+            <div class="login-footer" style="margin-top: 1.5rem; text-align: center;">
+                <p style="font-size: 0.8125rem; color: #6B7280;">
+                    © 2024 Also and Partners. All rights reserved.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Demo credentials info -->
+        <div style="position: fixed; bottom: 20px; left: 20px; background: rgba(255,255,255,0.95); padding: 15px 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 280px; font-size: 0.8125rem;">
+            <strong style="color: #1E3A5F; display: block; margin-bottom: 8px;">Demo Credentials:</strong>
+            <div style="color: #4B5563; line-height: 1.6;">
+                <div><code>superadmin</code> / <code>admin123</code></div>
+                <div><code>owner</code> / <code>owner123</code></div>
+                <div><code>partner</code> / <code>partner123</code></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        // Initialize data
+        DataManager.init();
+        
+        // Update logo from firm profile
+        const firm = DataManager.getFirmProfile();
+        if (firm && firm.logo) {
+            document.getElementById('login-logo').src = firm.logo;
+        }
+        
+        // Redirect if already logged in
+        if (Auth.isLoggedIn()) {
+            window.location.href = 'dashboard.html';
+        }
+        
+        // Handle login form
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+            const errorMessage = document.getElementById('error-message');
+            
+            const result = Auth.login(username, password);
+            
+            if (result.success) {
+                window.location.href = 'dashboard.html';
+            } else {
+                errorDiv.style.display = 'flex';
+                errorMessage.textContent = result.message;
+                
+                // Shake animation
+                const card = document.querySelector('.login-card');
+                card.style.animation = 'none';
+                setTimeout(() => {
+                    card.style.animation = 'shake 0.5s ease-out';
+                }, 10);
+            }
+        });
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

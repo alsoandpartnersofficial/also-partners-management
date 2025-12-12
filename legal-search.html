@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Legal Search - Also and Partners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .search-hero {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2d4a6f 100%);
+            border-radius: var(--radius-lg);
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .search-hero h2 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-hero p {
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        .ai-search-box {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .ai-search-box textarea {
+            width: 100%;
+            padding: 1.25rem 1.5rem;
+            padding-right: 60px;
+            border: none;
+            border-radius: 16px;
+            font-size: 1rem;
+            resize: none;
+            background: white;
+            color: var(--text-primary);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .ai-search-box textarea:focus {
+            outline: 3px solid var(--accent-gold);
+        }
+
+        .ai-search-box button {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--accent-gold);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .ai-search-box button:hover {
+            background: #c9a030;
+            transform: scale(1.05);
+        }
+
+        .ai-search-box button:disabled {
+            background: var(--gray-400);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .search-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .suggestion-chip {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .ai-response {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .ai-response-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ai-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-navy), var(--accent-gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .ai-response-body {
+            padding: 2rem;
+        }
+
+        .ai-response-body h3 {
+            color: var(--primary-navy);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .ai-response-body p {
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .ai-response-body ul,
+        .ai-response-body ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .ai-response-body li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .ai-response-body code {
+            background: var(--bg-tertiary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .loading-animation {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background: var(--primary-navy);
+            border-radius: 50%;
+            display: inline-block;
+            animation: loadingDot 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0s;
+        }
+
+        @keyframes loadingDot {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        .search-history {
+            margin-top: 2rem;
+        }
+
+        .history-item {
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            background: var(--bg-tertiary);
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            background: var(--gray-200);
+        }
+
+        .history-item .query {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .history-item .time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Logo" class="sidebar-logo" id="sidebar-logo">
+                <div class="sidebar-brand">
+                    <h2 id="sidebar-firm-name">Also and Partners</h2>
+                    <p>Advocates & Legal Consultants</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-menu-toggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <h1>AI Legal Search</h1>
+                </div>
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="notification-btn" onclick="App.toggleTheme()">
+                            <i id="theme-icon" class="fas fa-moon"></i>
+                        </button>
+                        <div class="dropdown">
+                            <div class="user-menu dropdown-trigger">
+                                <div class="user-avatar" id="header-avatar"></div>
+                                <div class="user-info">
+                                    <h4 id="header-user-name">User</h4>
+                                    <p id="header-user-role">Role</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                                    <i class="fas fa-user"></i><span>Profile</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="Auth.logout()">
+                                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="search-hero">
+                    <h2><i class="fas fa-robot mr-sm"></i> AI Legal Assistant</h2>
+                    <p>Powered by Google Gemini - Cari referensi hukum, peraturan, dan panduan legal</p>
+
+                    <div class="ai-search-box">
+                        <textarea id="search-query"
+                            placeholder="Tanyakan sesuatu tentang hukum Indonesia... Contoh: 'Bagaimana prosedur pengajuan gugatan perdata?'"
+                            rows="3" onkeydown="handleKeyDown(event)"></textarea>
+                        <button onclick="performSearch()" id="search-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+
+                    <div class="search-suggestions">
+                        <span class="suggestion-chip" onclick="useSuggestion(this)">Prosedur gugatan perdata</span>
+                        <span class="suggestion-chip" onclick="useSuggestion(this)">Hak karyawan menurut UU
+                            Ketenagakerjaan</span>
+                        <span class="suggestion-chip" onclick="useSuggestion(this)">Syarat mendirikan PT</span>
+                        <span class="suggestion-chip" onclick="useSuggestion(this)">Hukum waris di Indonesia</span>
+                    </div>
+                </div>
+
+                <div id="search-results">
+                    <!-- Results populated by JS -->
+                </div>
+
+                <div class="d-grid gap-lg" style="grid-template-columns: 2fr 1fr;" id="results-layout"
+                    style="display: none;">
+                    <div id="ai-response-container">
+                        <!-- AI Response here -->
+                    </div>
+
+                    <div class="card search-history">
+                        <div class="card-header">
+                            <h3><i class="fas fa-history mr-sm"></i> Riwayat Pencarian</h3>
+                        </div>
+                        <div class="card-body" id="search-history">
+                            <!-- History here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        if (!Auth.isLoggedIn()) {
+            window.location.href = 'index.html';
+        }
+
+        // Store search history in localStorage
+        const HISTORY_KEY = 'legal_search_history';
+        let searchHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initPage();
+            renderHistory();
+        });
+
+        function initPage() {
+            const user = Auth.getCurrentUser();
+            const firm = DataManager.getFirmProfile();
+
+            document.getElementById('sidebar-logo').src = firm.logo;
+            document.getElementById('sidebar-firm-name').textContent = firm.firmName;
+            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
+            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+            document.getElementById('header-user-name').textContent = user.fullName;
+            document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                performSearch();
+            }
+        }
+
+        function useSuggestion(element) {
+            document.getElementById('search-query').value = element.textContent;
+            performSearch();
+        }
+
+        async function performSearch() {
+            const query = document.getElementById('search-query').value.trim();
+            if (!query) {
+                Utils.showToast('Masukkan pertanyaan Anda', 'error');
+                return;
+            }
+
+            const searchBtn = document.getElementById('search-btn');
+            searchBtn.disabled = true;
+
+            // Show loading state
+            document.getElementById('search-results').innerHTML = `
+                <div class="ai-response">
+                    <div class="ai-response-header">
+                        <div class="ai-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <h3 class="m-0">AI Legal Assistant</h3>
+                            <div class="loading-animation">
+                                <span>Mencari referensi hukum</span>
+                                <div class="loading-dots">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            try {
+                // Check for API key
+                const apiKey = localStorage.getItem('gemini_api_key');
+
+                let response;
+                if (apiKey) {
+                    response = await callGeminiAPI(query, apiKey);
+                } else {
+                    // Fallback to simulated response for demo
+                    response = await simulateAIResponse(query);
+                }
+
+                // Save to history
+                addToHistory(query, response);
+
+                // Display response
+                displayResponse(query, response);
+
+            } catch (error) {
+                console.error('Search error:', error);
+                document.getElementById('search-results').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle mr-sm"></i>
+                        Terjadi kesalahan saat memproses pencarian. Silakan coba lagi.
+                    </div>
+                `;
+            }
+
+            searchBtn.disabled = false;
+        }
+
+        async function callGeminiAPI(query, apiKey) {
+            const prompt = `Anda adalah asisten hukum profesional yang ahli dalam hukum Indonesia. 
+            Berikan jawaban yang komprehensif, akurat, dan mudah dipahami untuk pertanyaan berikut.
+            Sertakan referensi ke Undang-Undang atau peraturan yang relevan jika ada.
+            Format jawaban dengan heading dan bullet points yang jelas.
+            
+            Pertanyaan: ${query}`;
+
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: prompt }]
+                    }]
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('API request failed');
+            }
+
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        async function simulateAIResponse(query) {
+            // Simulated delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // Simulated responses based on keywords
+            const responses = {
+                'gugatan': `
+                    <h3>Prosedur Pengajuan Gugatan Perdata di Indonesia</h3>
+                    <p>Berdasarkan Herzien Inlandsch Reglement (HIR) dan Rechtsreglement Buitengewesten (RBg), berikut adalah prosedur pengajuan gugatan perdata:</p>
+                    
+                    <h4>1. Persiapan Dokumen</h4>
+                    <ul>
+                        <li>Surat gugatan yang memuat identitas para pihak, posita (dalil-dalil gugatan), dan petitum (tuntutan)</li>
+                        <li>Bukti-bukti yang mendukung gugatan</li>
+                        <li>Surat kuasa khusus jika menggunakan kuasa hukum</li>
+                    </ul>
+                    
+                    <h4>2. Pengajuan Gugatan</h4>
+                    <ul>
+                        <li>Gugatan didaftarkan di Kepaniteraan Pengadilan Negeri yang berwenang</li>
+                        <li>Pembayaran panjar biaya perkara</li>
+                        <li>Pendaftaran dan penetapan nomor perkara</li>
+                    </ul>
+                    
+                    <h4>3. Proses Persidangan</h4>
+                    <ul>
+                        <li>Mediasi (wajib berdasarkan PERMA No. 1 Tahun 2016)</li>
+                        <li>Pembacaan gugatan</li>
+                        <li>Jawaban tergugat</li>
+                        <li>Replik dan duplik</li>
+                        <li>Pembuktian</li>
+                        <li>Kesimpulan</li>
+                        <li>Putusan</li>
+                    </ul>
+                    
+                    <h4>Dasar Hukum:</h4>
+                    <ul>
+                        <li>HIR (Herzien Inlandsch Reglement) Pasal 118-245</li>
+                        <li>RBg (Rechtsreglement Buitengewesten) Pasal 142-314</li>
+                        <li>PERMA No. 1 Tahun 2016 tentang Prosedur Mediasi di Pengadilan</li>
+                    </ul>
+                `,
+                'karyawan': `
+                    <h3>Hak-Hak Karyawan Menurut UU Ketenagakerjaan</h3>
+                    <p>Berdasarkan Undang-Undang Nomor 13 Tahun 2003 tentang Ketenagakerjaan dan UU Cipta Kerja, berikut adalah hak-hak fundamental karyawan:</p>
+                    
+                    <h4>1. Hak Atas Upah</h4>
+                    <ul>
+                        <li>Upah minimum sesuai UMR/UMK</li>
+                        <li>Upah lembur untuk kerja melebihi waktu normal</li>
+                        <li>THR (Tunjangan Hari Raya)</li>
+                    </ul>
+                    
+                    <h4>2. Hak Waktu Kerja dan Istirahat</h4>
+                    <ul>
+                        <li>Waktu kerja maksimal 40 jam per minggu</li>
+                        <li>Istirahat mingguan minimal 1 hari</li>
+                        <li>Cuti tahunan minimal 12 hari</li>
+                    </ul>
+                    
+                    <h4>3. Hak Jaminan Sosial</h4>
+                    <ul>
+                        <li>BPJS Kesehatan</li>
+                        <li>BPJS Ketenagakerjaan (JKK, JKM, JHT, JP)</li>
+                    </ul>
+                    
+                    <h4>Dasar Hukum:</h4>
+                    <ul>
+                        <li>UU No. 13 Tahun 2003 tentang Ketenagakerjaan</li>
+                        <li>UU No. 11 Tahun 2020 tentang Cipta Kerja</li>
+                        <li>PP No. 35 Tahun 2021</li>
+                    </ul>
+                `,
+                'pt': `
+                    <h3>Syarat dan Prosedur Mendirikan Perseroan Terbatas (PT)</h3>
+                    <p>Berdasarkan UU No. 40 Tahun 2007 tentang Perseroan Terbatas dan perubahannya dalam UU Cipta Kerja:</p>
+                    
+                    <h4>1. Syarat Pendirian</h4>
+                    <ul>
+                        <li>Didirikan oleh minimal 2 (dua) orang atau lebih</li>
+                        <li>Akta pendirian dibuat dalam bahasa Indonesia di hadapan Notaris</li>
+                        <li>Modal dasar minimal Rp 50 juta (atau sesuai ketentuan terbaru)</li>
+                        <li>Minimal 25% modal dasar harus ditempatkan dan disetor</li>
+                    </ul>
+                    
+                    <h4>2. Prosedur Pendirian</h4>
+                    <ul>
+                        <li>Pembuatan Akta Pendirian oleh Notaris</li>
+                        <li>Pengesahan oleh Kementerian Hukum dan HAM melalui sistem AHU Online</li>
+                        <li>Pendaftaran NIB melalui OSS (Online Single Submission)</li>
+                        <li>Pendaftaran NPWP perusahaan</li>
+                    </ul>
+                    
+                    <h4>Dasar Hukum:</h4>
+                    <ul>
+                        <li>UU No. 40 Tahun 2007 tentang Perseroan Terbatas</li>
+                        <li>UU No. 11 Tahun 2020 tentang Cipta Kerja</li>
+                        <li>PP No. 8 Tahun 2021</li>
+                    </ul>
+                `,
+                'waris': `
+                    <h3>Hukum Waris di Indonesia</h3>
+                    <p>Indonesia mengenal tiga sistem hukum waris yang berlaku:</p>
+                    
+                    <h4>1. Hukum Waris Perdata (BW)</h4>
+                    <ul>
+                        <li>Berlaku bagi WNI keturunan Tionghoa dan Eropa</li>
+                        <li>Ahli waris: golongan I (anak dan pasangan), golongan II (orangtua dan saudara), dll</li>
+                        <li>Mengenal legitime portie (bagian mutlak)</li>
+                    </ul>
+                    
+                    <h4>2. Hukum Waris Islam</h4>
+                    <ul>
+                        <li>Berlaku bagi WNI beragama Islam</li>
+                        <li>Diatur dalam Kompilasi Hukum Islam</li>
+                        <li>Mengenal ashabul furudh dan ashabah</li>
+                        <li>Bagian laki-laki 2x bagian perempuan</li>
+                    </ul>
+                    
+                    <h4>3. Hukum Waris Adat</h4>
+                    <ul>
+                        <li>Berbeda-beda sesuai daerah dan suku</li>
+                        <li>Sistem patrilineal, matrilineal, atau bilateral</li>
+                    </ul>
+                    
+                    <h4>Dasar Hukum:</h4>
+                    <ul>
+                        <li>Kitab Undang-Undang Hukum Perdata (BW)</li>
+                        <li>Kompilasi Hukum Islam (Inpres No. 1 Tahun 1991)</li>
+                        <li>Hukum Adat setempat</li>
+                    </ul>
+                `
+            };
+
+            // Find matching response
+            const lowerQuery = query.toLowerCase();
+            for (const [keyword, response] of Object.entries(responses)) {
+                if (lowerQuery.includes(keyword)) {
+                    return response;
+                }
+            }
+
+            // Default response
+            return `
+                <h3>Hasil Pencarian</h3>
+                <p>Terima kasih atas pertanyaan Anda mengenai: "${query}"</p>
+                
+                <p>Untuk mendapatkan jawaban yang lebih akurat dan komprehensif, silakan:</p>
+                <ol>
+                    <li>Konfigurasi API Key Google Gemini di halaman <a href="firm-settings.html">Pengaturan</a></li>
+                    <li>Atau konsultasikan langsung dengan tim lawyer kami</li>
+                </ol>
+                
+                <p><em>Catatan: Ini adalah demo simulasi. Untuk fitur AI sepenuhnya, diperlukan integrasi dengan Google Gemini API.</em></p>
+            `;
+        }
+
+        function displayResponse(query, response) {
+            document.getElementById('search-results').innerHTML = `
+                <div class="ai-response">
+                    <div class="ai-response-header">
+                        <div class="ai-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <h3 class="m-0">AI Legal Assistant</h3>
+                            <p class="text-secondary m-0 text-sm">"${Utils.truncate(query, 60)}"</p>
+                        </div>
+                    </div>
+                    <div class="ai-response-body">
+                        ${response}
+                    </div>
+                    <div class="p-lg border-top d-flex justify-content-between align-items-center">
+                        <div class="text-sm text-secondary">
+                            <i class="fas fa-info-circle mr-sm"></i>
+                            Informasi ini bersifat umum dan bukan nasihat hukum. Konsultasikan dengan lawyer untuk kasus spesifik.
+                        </div>
+                        <div class="d-flex gap-sm">
+                            <button class="btn btn-sm btn-secondary" onclick="copyResponse()">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addToHistory(query, response) {
+            searchHistory.unshift({
+                query: query,
+                response: response,
+                timestamp: new Date().toISOString()
+            });
+
+            // Keep only last 10 searches
+            searchHistory = searchHistory.slice(0, 10);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(searchHistory));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('search-history');
+            if (!container) return;
+
+            if (searchHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-secondary p-lg">
+                        <i class="fas fa-history" style="font-size: 2rem; color: var(--gray-300);"></i>
+                        <p class="mt-md">Belum ada riwayat pencarian</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = searchHistory.map((item, index) => `
+                <div class="history-item" onclick="loadFromHistory(${index})">
+                    <div class="query">${Utils.truncate(item.query, 50)}</div>
+                    <div class="time">${Utils.formatDateTime(item.timestamp)}</div>
+                </div>
+            `).join('');
+        }
+
+        function loadFromHistory(index) {
+            const item = searchHistory[index];
+            if (item) {
+                document.getElementById('search-query').value = item.query;
+                displayResponse(item.query, item.response);
+            }
+        }
+
+        function copyResponse() {
+            const responseBody = document.querySelector('.ai-response-body');
+            if (responseBody) {
+                const text = responseBody.innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    Utils.showToast('Jawaban berhasil disalin', 'success');
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>

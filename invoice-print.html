@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - Also and Partners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @media print {
+            body {
+                background: white !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .invoice-container {
+                box-shadow: none !important;
+                margin: 0 !important;
+                max-width: none !important;
+            }
+        }
+
+        .invoice-page {
+            min-height: 100vh;
+            background: var(--bg-secondary);
+            padding: 2rem;
+        }
+
+        .invoice-actions {
+            max-width: 900px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .invoice-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .invoice-header {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2d4a6f 100%);
+            color: white;
+            padding: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .invoice-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .invoice-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            background: white;
+            padding: 8px;
+        }
+
+        .invoice-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .invoice-firm-name {
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .invoice-firm-tagline {
+            opacity: 0.8;
+            font-size: 0.875rem;
+        }
+
+        .invoice-header-right {
+            text-align: right;
+        }
+
+        .invoice-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .invoice-number {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+
+        .invoice-body {
+            padding: 2.5rem;
+        }
+
+        .invoice-info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .invoice-info-block h4 {
+            color: var(--primary-navy);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+        }
+
+        .invoice-info-block p {
+            margin: 0.25rem 0;
+            color: #4B5563;
+        }
+
+        .invoice-info-block .client-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+
+        .invoice-table th {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .invoice-table th:last-child,
+        .invoice-table td:last-child {
+            text-align: right;
+        }
+
+        .invoice-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .invoice-table tbody tr:last-child td {
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .invoice-summary {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .invoice-summary-table {
+            width: 300px;
+        }
+
+        .invoice-summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .invoice-summary-row.total {
+            border-bottom: none;
+            border-top: 2px solid var(--primary-navy);
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+        }
+
+        .invoice-summary-row.total .label,
+        .invoice-summary-row.total .value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-navy);
+        }
+
+        .invoice-notes {
+            background: var(--bg-tertiary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        .invoice-notes h4 {
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .invoice-notes p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .invoice-footer {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-tertiary);
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .invoice-footer p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin: 0.25rem 0;
+        }
+
+        .status-badge-large {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-badge-large.paid {
+            background: #DEF7EC;
+            color: #03543F;
+        }
+
+        .status-badge-large.partial {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-badge-large.unpaid {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="invoice-page">
+        <div class="invoice-actions no-print">
+            <a href="invoices.html" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
+            <div class="d-flex gap-sm">
+                <button class="btn btn-secondary" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button class="btn btn-primary" onclick="downloadPDF()">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </button>
+            </div>
+        </div>
+
+        <div class="invoice-container" id="invoice-content">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        let invoiceData = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const isPreview = Utils.getUrlParam('preview') === 'true';
+
+            if (isPreview) {
+                const previewData = localStorage.getItem('invoice_preview');
+                if (previewData) {
+                    invoiceData = JSON.parse(previewData);
+                    invoiceData.createdAt = new Date().toISOString();
+                    renderInvoice();
+                }
+            } else {
+                const invoiceId = Utils.getUrlParam('id');
+                if (!invoiceId) {
+                    window.location.href = 'invoices.html';
+                    return;
+                }
+
+                invoiceData = DataManager.getInvoiceById(invoiceId);
+                if (!invoiceData) {
+                    window.location.href = 'invoices.html';
+                    return;
+                }
+                renderInvoice();
+            }
+        });
+
+        function renderInvoice() {
+            const firm = DataManager.getFirmProfile();
+            const client = DataManager.getClientById(invoiceData.clientId);
+            const caseData = invoiceData.caseId ? DataManager.getCaseById(invoiceData.caseId) : null;
+
+            const statusClass = invoiceData.status === 'paid' ? 'paid' :
+                invoiceData.status === 'partial' ? 'partial' : 'unpaid';
+            const statusLabel = invoiceData.status === 'paid' ? 'LUNAS' :
+                invoiceData.status === 'partial' ? 'BAYAR SEBAGIAN' : 'BELUM BAYAR';
+
+            document.getElementById('invoice-content').innerHTML = `
+                <div class="invoice-header">
+                    <div class="invoice-header-left">
+                        <div class="invoice-logo">
+                            <img src="${firm.logo}" alt="Logo">
+                        </div>
+                        <div>
+                            <h1 class="invoice-firm-name">${firm.firmName}</h1>
+                            <p class="invoice-firm-tagline">Advocates & Legal Consultants</p>
+                        </div>
+                    </div>
+                    <div class="invoice-header-right">
+                        <div class="invoice-title">INVOICE</div>
+                        <div class="invoice-number">${invoiceData.invoiceNumber}</div>
+                    </div>
+                </div>
+                
+                <div class="invoice-body">
+                    <div class="invoice-info-row">
+                        <div class="invoice-info-block">
+                            <h4>Tagihan Kepada</h4>
+                            <p class="client-name">${client?.name || 'Unknown Client'}</p>
+                            ${client?.contactPerson ? `<p>${client.contactPerson}</p>` : ''}
+                            ${client?.address ? `<p>${client.address}</p>` : ''}
+                            <p>${client?.email || ''}</p>
+                            <p>${client?.phone || ''}</p>
+                        </div>
+                        <div class="invoice-info-block">
+                            <h4>Dari</h4>
+                            <p class="client-name">${firm.firmName}</p>
+                            <p>${firm.address || ''}</p>
+                            <p>${firm.email || ''}</p>
+                            <p>${firm.phone || ''}</p>
+                        </div>
+                        <div class="invoice-info-block">
+                            <h4>Detail Invoice</h4>
+                            <p><strong>No. Invoice:</strong> ${invoiceData.invoiceNumber}</p>
+                            <p><strong>Tanggal:</strong> ${Utils.formatDate(invoiceData.issueDate)}</p>
+                            <p><strong>Jatuh Tempo:</strong> ${Utils.formatDate(invoiceData.dueDate)}</p>
+                            ${caseData ? `<p><strong>Kasus:</strong> ${caseData.caseNumber}</p>` : ''}
+                            <div class="mt-md">
+                                <span class="status-badge-large ${statusClass}">${statusLabel}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50%;">Deskripsi</th>
+                                <th>Qty</th>
+                                <th>Satuan</th>
+                                <th>Harga</th>
+                                <th>Jumlah</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(invoiceData.items || []).map(item => `
+                                <tr>
+                                    <td>${item.description}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>${item.unit}</td>
+                                    <td>${Utils.formatCurrency(item.unitPrice)}</td>
+                                    <td>${Utils.formatCurrency(item.amount)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <div class="invoice-summary">
+                        <div class="invoice-summary-table">
+                            <div class="invoice-summary-row">
+                                <span class="label">Subtotal</span>
+                                <span class="value">${Utils.formatCurrency(invoiceData.subtotal)}</span>
+                            </div>
+                            ${invoiceData.taxAmount > 0 ? `
+                                <div class="invoice-summary-row">
+                                    <span class="label">PPN (${invoiceData.taxRate}%)</span>
+                                    <span class="value">${Utils.formatCurrency(invoiceData.taxAmount)}</span>
+                                </div>
+                            ` : ''}
+                            ${invoiceData.discount > 0 ? `
+                                <div class="invoice-summary-row">
+                                    <span class="label">Diskon</span>
+                                    <span class="value">-${Utils.formatCurrency(invoiceData.discount)}</span>
+                                </div>
+                            ` : ''}
+                            <div class="invoice-summary-row total">
+                                <span class="label">TOTAL</span>
+                                <span class="value">${Utils.formatCurrency(invoiceData.totalAmount)}</span>
+                            </div>
+                            ${(invoiceData.paidAmount || 0) > 0 ? `
+                                <div class="invoice-summary-row">
+                                    <span class="label">Terbayar</span>
+                                    <span class="value text-success">${Utils.formatCurrency(invoiceData.paidAmount)}</span>
+                                </div>
+                                <div class="invoice-summary-row">
+                                    <span class="label"><strong>Sisa</strong></span>
+                                    <span class="value"><strong class="text-danger">${Utils.formatCurrency(invoiceData.totalAmount - invoiceData.paidAmount)}</strong></span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    ${invoiceData.notes ? `
+                        <div class="invoice-notes">
+                            <h4><i class="fas fa-sticky-note mr-sm"></i> Catatan</h4>
+                            <p>${invoiceData.notes}</p>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="invoice-notes mt-lg">
+                        <h4><i class="fas fa-info-circle mr-sm"></i> Informasi Pembayaran</h4>
+                        <p>Bank: ${firm.bankName || 'Bank Central Asia (BCA)'}</p>
+                        <p>No. Rekening: ${firm.bankAccount || '123-456-7890'}</p>
+                        <p>Atas Nama: ${firm.firmName}</p>
+                    </div>
+                </div>
+                
+                <div class="invoice-footer">
+                    <p><strong>${firm.firmName}</strong></p>
+                    <p>${firm.address || 'Jakarta, Indonesia'}</p>
+                    <p>Tel: ${firm.phone || ''} | Email: ${firm.email || ''}</p>
+                    <p class="mt-md" style="font-size: 0.75rem; opacity: 0.7;">
+                        Invoice ini dibuat secara elektronik dan sah tanpa tanda tangan.
+                    </p>
+                </div>
+            `;
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('invoice-content');
+            const opt = {
+                margin: 0,
+                filename: `${invoiceData.invoiceNumber}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+
+</html>

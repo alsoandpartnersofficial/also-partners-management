@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Also and Partners - Law Firm Management System Dashboard">
+    <title>Dashboard - Also and Partners</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Logo" class="sidebar-logo" id="sidebar-logo">
+                <div class="sidebar-brand">
+                    <h2 id="sidebar-firm-name">Also and Partners</h2>
+                    <p>Advocates & Legal Consultants</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <!-- Populated by JS -->
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-menu-toggle" class="icon-btn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <div class="header-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Cari...">
+                    </div>
+                    <div class="header-actions">
+                        <button class="notification-btn" onclick="App.toggleTheme()">
+                            <i id="theme-icon" class="fas fa-moon"></i>
+                        </button>
+                        <button class="notification-btn">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notification-count">3</span>
+                        </button>
+                        <div class="dropdown">
+                            <div class="user-menu dropdown-trigger">
+                                <div class="user-avatar" id="header-avatar"></div>
+                                <div class="user-info">
+                                    <h4 id="header-user-name">User</h4>
+                                    <p id="header-user-role">Role</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                                    <i class="fas fa-user"></i>
+                                    <span>Profile</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="Auth.logout()">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <!-- Welcome Section -->
+                <div class="mb-xl">
+                    <h2 id="welcome-message" style="font-family: var(--font-heading); margin-bottom: 0.5rem;">Selamat
+                        Datang!</h2>
+                    <p class="text-secondary" id="welcome-date"></p>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Total Kasus</h4>
+                            <div class="stat-value" id="stat-total-cases">0</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span id="stat-active-cases">0 aktif</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon gold">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Total Klien</h4>
+                            <div class="stat-value" id="stat-total-clients">0</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Bulan ini</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Pendapatan</h4>
+                            <div class="stat-value" id="stat-revenue">Rp 0</div>
+                            <div class="stat-change" id="stat-pending">
+                                <span>Pending: Rp 0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Jadwal Mendatang</h4>
+                            <div class="stat-value" id="stat-events">0</div>
+                            <div class="stat-change">
+                                <span>Event terjadwal</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card mb-xl" id="quick-actions-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bolt mr-sm"></i> Aksi Cepat</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="quick-actions" id="quick-actions">
+                            <!-- Populated by JS based on role -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid grid-cols-2 gap-lg" style="grid-template-columns: 1fr 1fr;">
+                    <!-- Recent Cases -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-briefcase mr-sm"></i> Kasus Terbaru</h3>
+                            <a href="cases.html" class="btn btn-sm btn-secondary">Lihat Semua</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Kasus</th>
+                                            <th>Klien</th>
+                                            <th>Status</th>
+                                            <th>Progress</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-cases">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Events -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-calendar-alt mr-sm"></i> Jadwal Mendatang</h3>
+                            <a href="schedule.html" class="btn btn-sm btn-secondary">Lihat Semua</a>
+                        </div>
+                        <div class="card-body" id="upcoming-events">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Invoices (for admin/owner/partner) -->
+                <div class="card mt-xl" id="recent-invoices-card" style="display: none;">
+                    <div class="card-header">
+                        <h3><i class="fas fa-file-invoice-dollar mr-sm"></i> Invoice Terbaru</h3>
+                        <a href="invoices.html" class="btn btn-sm btn-secondary">Lihat Semua</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>No. Invoice</th>
+                                        <th>Klien</th>
+                                        <th>Jumlah</th>
+                                        <th>Status</th>
+                                        <th>Jatuh Tempo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-invoices">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Check auth
+        if (!Auth.isLoggedIn()) {
+            window.location.href = 'index.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const user = Auth.getCurrentUser();
+            const firm = DataManager.getFirmProfile();
+            const stats = DataManager.getStatistics();
+
+            // Update sidebar logo
+            document.getElementById('sidebar-logo').src = firm.logo;
+            document.getElementById('sidebar-firm-name').textContent = firm.firmName;
+
+            // Update header user info
+            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
+            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+            document.getElementById('header-user-name').textContent = user.fullName;
+            document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
+
+            // Welcome message
+            document.getElementById('welcome-message').textContent = `Selamat Datang, ${user.fullName.split(' ')[0]}!`;
+            document.getElementById('welcome-date').textContent = Utils.formatDate(new Date(), {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            // Update statistics
+            document.getElementById('stat-total-cases').textContent = stats.totalCases;
+            document.getElementById('stat-active-cases').textContent = `${stats.activeCases} aktif`;
+            document.getElementById('stat-total-clients').textContent = stats.totalClients;
+            document.getElementById('stat-revenue').textContent = Utils.formatCurrency(stats.paidRevenue);
+            document.getElementById('stat-pending').innerHTML = `<span>Pending: ${Utils.formatCurrency(stats.pendingRevenue)}</span>`;
+            document.getElementById('stat-events').textContent = stats.upcomingEvents;
+
+            // Quick Actions based on role
+            renderQuickActions(user.role);
+
+            // Recent Cases
+            renderRecentCases();
+
+            // Upcoming Events
+            renderUpcomingEvents();
+
+            // Recent Invoices (for specific roles)
+            if (Auth.canManageInvoices()) {
+                document.getElementById('recent-invoices-card').style.display = 'block';
+                renderRecentInvoices();
+            }
+        });
+
+        function renderQuickActions(role) {
+            const actions = [];
+
+            // Common actions
+            actions.push({ icon: 'fas fa-briefcase', label: 'Kasus Baru', href: 'cases.html?action=new' });
+            actions.push({ icon: 'fas fa-calendar-plus', label: 'Tambah Jadwal', href: 'schedule.html?action=new' });
+            actions.push({ icon: 'fas fa-upload', label: 'Upload Dokumen', href: 'documents.html?action=upload' });
+            actions.push({ icon: 'fas fa-robot', label: 'AI Legal Search', href: 'legal-search.html' });
+
+            // Role-specific actions
+            if (Auth.canManageClients()) {
+                actions.unshift({ icon: 'fas fa-user-plus', label: 'Klien Baru', href: 'clients.html?action=new' });
+            }
+            if (Auth.canManageInvoices()) {
+                actions.push({ icon: 'fas fa-file-invoice', label: 'Buat Invoice', href: 'invoice-create.html' });
+            }
+            if (Auth.canManageUsers()) {
+                actions.push({ icon: 'fas fa-user-cog', label: 'Kelola User', href: 'users.html' });
+            }
+
+            const container = document.getElementById('quick-actions');
+            container.innerHTML = actions.slice(0, 6).map(action => `
+                <a href="${action.href}" class="quick-action-btn">
+                    <i class="${action.icon}"></i>
+                    <span>${action.label}</span>
+                </a>
+            `).join('');
+        }
+
+        function renderRecentCases() {
+            const user = Auth.getCurrentUser();
+            let cases = DataManager.getCases();
+
+            // Filter based on role
+            if (!Auth.canViewAllCases()) {
+                cases = cases.filter(c => c.assignedLawyers && c.assignedLawyers.includes(user.id));
+            }
+
+            // Sort by date and take last 5
+            cases = cases.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+
+            const tbody = document.getElementById('recent-cases');
+
+            if (cases.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center text-secondary p-lg">
+                            Tidak ada kasus
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = cases.map(c => {
+                const client = DataManager.getClientById(c.clientId);
+                return `
+                    <tr onclick="window.location.href='case-detail.html?id=${c.id}'" style="cursor: pointer;">
+                        <td>
+                            <div class="font-medium">${c.caseNumber}</div>
+                            <div class="text-sm text-secondary">${Utils.truncate(c.title, 30)}</div>
+                        </td>
+                        <td>${client?.name || '-'}</td>
+                        <td>${Utils.getStatusBadge(c.status)}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-sm">
+                                <div class="progress-bar" style="width: 60px;">
+                                    <div class="progress" style="width: ${c.progress}%"></div>
+                                </div>
+                                <span class="text-sm">${c.progress}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderUpcomingEvents() {
+            const user = Auth.getCurrentUser();
+            let schedules = DataManager.getSchedules();
+
+            // Filter upcoming events
+            const now = new Date();
+            schedules = schedules.filter(s => new Date(s.startTime) >= now && !s.isCompleted);
+
+            // Filter based on role
+            if (!Auth.canViewAllCases()) {
+                schedules = schedules.filter(s => s.userId === user.id);
+            }
+
+            // Sort and take next 5
+            schedules = schedules.sort((a, b) => new Date(a.startTime) - new Date(b.startTime)).slice(0, 5);
+
+            const container = document.getElementById('upcoming-events');
+
+            if (schedules.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state p-lg">
+                        <i class="fas fa-calendar-check" style="font-size: 2rem; color: var(--gray-300);"></i>
+                        <p class="text-secondary mt-md">Tidak ada jadwal mendatang</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const eventTypeColors = {
+                hearing: 'var(--danger)',
+                meeting: 'var(--info)',
+                deadline: 'var(--warning)',
+                reminder: 'var(--success)'
+            };
+
+            const eventTypeIcons = {
+                hearing: 'fas fa-gavel',
+                meeting: 'fas fa-handshake',
+                deadline: 'fas fa-clock',
+                reminder: 'fas fa-bell'
+            };
+
+            container.innerHTML = schedules.map(s => `
+                <div class="d-flex gap-md p-md rounded" style="background: var(--bg-tertiary); margin-bottom: 0.5rem;">
+                    <div style="width: 40px; height: 40px; border-radius: 8px; background: ${eventTypeColors[s.eventType]}20; color: ${eventTypeColors[s.eventType]}; display: flex; align-items: center; justify-content: center;">
+                        <i class="${eventTypeIcons[s.eventType]}"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div class="font-medium">${s.title}</div>
+                        <div class="text-sm text-secondary">
+                            <i class="fas fa-clock mr-sm"></i>
+                            ${Utils.formatDate(s.startTime, { day: 'numeric', month: 'short' })} - ${Utils.formatTime(s.startTime)}
+                        </div>
+                        ${s.location ? `<div class="text-sm text-secondary"><i class="fas fa-map-marker-alt mr-sm"></i>${s.location}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRecentInvoices() {
+            const invoices = DataManager.getInvoices()
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .slice(0, 5);
+
+            const tbody = document.getElementById('recent-invoices');
+
+            if (invoices.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-secondary p-lg">
+                            Tidak ada invoice
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = invoices.map(inv => {
+                const client = DataManager.getClientById(inv.clientId);
+                const daysUntil = Utils.daysUntil(inv.dueDate);
+                let dueDateClass = '';
+                if (inv.status !== 'paid') {
+                    if (daysUntil < 0) dueDateClass = 'text-danger';
+                    else if (daysUntil <= 7) dueDateClass = 'text-warning';
+                }
+
+                return `
+                    <tr onclick="window.location.href='invoice-print.html?id=${inv.id}'" style="cursor: pointer;">
+                        <td class="font-medium">${inv.invoiceNumber}</td>
+                        <td>${client?.name || '-'}</td>
+                        <td>${Utils.formatCurrency(inv.totalAmount)}</td>
+                        <td>${Utils.getStatusBadge(inv.status)}</td>
+                        <td class="${dueDateClass}">${Utils.formatDateShort(inv.dueDate)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+
+</html>

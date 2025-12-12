@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Detail - Also and Partners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Logo" class="sidebar-logo" id="sidebar-logo">
+                <div class="sidebar-brand">
+                    <h2 id="sidebar-firm-name">Also and Partners</h2>
+                    <p>Advocates & Legal Consultants</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-menu-toggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <a href="cases.html" class="btn btn-secondary btn-sm mr-md">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </a>
+                    <h1 id="page-title">Case Detail</h1>
+                </div>
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="notification-btn" onclick="App.toggleTheme()">
+                            <i id="theme-icon" class="fas fa-moon"></i>
+                        </button>
+                        <div class="dropdown">
+                            <div class="user-menu dropdown-trigger">
+                                <div class="user-avatar" id="header-avatar"></div>
+                                <div class="user-info">
+                                    <h4 id="header-user-name">User</h4>
+                                    <p id="header-user-role">Role</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                                    <i class="fas fa-user"></i><span>Profile</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="Auth.logout()">
+                                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content" id="case-content">
+                <!-- Populated by JS -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Update Progress Modal -->
+    <div class="modal-overlay" id="progress-modal">
+        <div class="modal" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Update Progress</h3>
+                <button class="modal-close" onclick="Utils.closeModal('progress-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Progress (%)</label>
+                    <input type="range" class="form-control" id="update-progress" min="0" max="100" value="0"
+                        style="padding: 0;">
+                    <div class="d-flex justify-content-between text-sm text-secondary mt-sm">
+                        <span>0%</span>
+                        <span id="update-progress-value" style="font-size: 1.25rem; font-weight: 700;">0%</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-control" id="update-status">
+                        <option value="open">Open</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="pending">Pending</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Catatan Update</label>
+                    <textarea class="form-control" id="update-notes" rows="3"
+                        placeholder="Tulis catatan update..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="Utils.closeModal('progress-modal')">Batal</button>
+                <button class="btn btn-primary" onclick="saveProgressUpdate()">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        if (!Auth.isLoggedIn()) {
+            window.location.href = 'index.html';
+        }
+
+        let currentCase = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initPage();
+            loadCaseDetail();
+
+            document.getElementById('update-progress').addEventListener('input', function () {
+                document.getElementById('update-progress-value').textContent = this.value + '%';
+            });
+        });
+
+        function initPage() {
+            const user = Auth.getCurrentUser();
+            const firm = DataManager.getFirmProfile();
+
+            document.getElementById('sidebar-logo').src = firm.logo;
+            document.getElementById('sidebar-firm-name').textContent = firm.firmName;
+            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
+            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+            document.getElementById('header-user-name').textContent = user.fullName;
+            document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
+        }
+
+        function loadCaseDetail() {
+            const caseId = Utils.getUrlParam('id');
+            if (!caseId) {
+                window.location.href = 'cases.html';
+                return;
+            }
+
+            currentCase = DataManager.getCaseById(caseId);
+            if (!currentCase) {
+                window.location.href = 'cases.html';
+                return;
+            }
+
+            document.getElementById('page-title').textContent = currentCase.caseNumber;
+            renderCaseDetail();
+        }
+
+        function renderCaseDetail() {
+            const c = currentCase;
+            const client = DataManager.getClientById(c.clientId);
+            const lawyers = (c.assignedLawyers || []).map(id => DataManager.getUserById(id)).filter(Boolean);
+            const documents = DataManager.getDocuments().filter(d => d.caseId === c.id);
+            const schedules = DataManager.getSchedules().filter(s => s.caseId === c.id);
+            const daysUntil = Utils.daysUntil(c.deadline);
+
+            let deadlineAlert = '';
+            if (c.status !== 'closed') {
+                if (daysUntil < 0) {
+                    deadlineAlert = `<div class="alert alert-danger mb-lg"><i class="fas fa-exclamation-triangle"></i> Deadline sudah lewat ${Math.abs(daysUntil)} hari!</div>`;
+                } else if (daysUntil <= 7) {
+                    deadlineAlert = `<div class="alert alert-warning mb-lg"><i class="fas fa-clock"></i> ${daysUntil} hari menuju deadline</div>`;
+                }
+            }
+
+            document.getElementById('case-content').innerHTML = `
+                ${deadlineAlert}
+                
+                <div class="d-flex justify-content-between align-items-start mb-xl flex-wrap gap-lg">
+                    <div>
+                        <h2 style="font-family: var(--font-heading); margin-bottom: 0.5rem;">${c.title}</h2>
+                        <div class="d-flex align-items-center gap-md flex-wrap">
+                            <code style="font-size: 1rem;">${c.caseNumber}</code>
+                            ${Utils.getStatusBadge(c.status)}
+                            ${Utils.getPriorityBadge(c.priority)}
+                            <span class="badge badge-primary">${c.caseType || 'General'}</span>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-sm">
+                        <button class="btn btn-gold" onclick="openProgressModal()">
+                            <i class="fas fa-chart-line"></i> Update Progress
+                        </button>
+                        <a href="cases.html" class="btn btn-secondary" onclick="editCase()">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-lg" style="grid-template-columns: 2fr 1fr;">
+                    <!-- Left Column -->
+                    <div>
+                        <!-- Progress Card -->
+                        <div class="card mb-lg">
+                            <div class="card-header">
+                                <h3><i class="fas fa-chart-pie mr-sm"></i> Progress</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-lg mb-lg">
+                                    <div style="width: 120px; height: 120px; position: relative;">
+                                        <svg width="120" height="120" style="transform: rotate(-90deg);">
+                                            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--gray-200)" stroke-width="12"/>
+                                            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--primary-navy)" stroke-width="12"
+                                                stroke-dasharray="${314 * c.progress / 100} 314"
+                                                stroke-linecap="round"/>
+                                        </svg>
+                                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-navy);">${c.progress}%</div>
+                                        </div>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div class="mb-md">
+                                            <span class="text-secondary">Tanggal Mulai:</span>
+                                            <strong class="ml-sm">${Utils.formatDate(c.startDate)}</strong>
+                                        </div>
+                                        <div class="mb-md">
+                                            <span class="text-secondary">Deadline:</span>
+                                            <strong class="ml-sm ${daysUntil < 0 ? 'text-danger' : ''}">${Utils.formatDate(c.deadline)}</strong>
+                                        </div>
+                                        <div>
+                                            <span class="text-secondary">Durasi:</span>
+                                            <strong class="ml-sm">${Utils.daysBetween(c.startDate, c.deadline)} hari</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="card mb-lg">
+                            <div class="card-header">
+                                <h3><i class="fas fa-align-left mr-sm"></i> Deskripsi</h3>
+                            </div>
+                            <div class="card-body">
+                                <p>${c.description || 'Tidak ada deskripsi'}</p>
+                                ${c.notes ? `
+                                    <div class="mt-lg pt-lg border-top">
+                                        <h4 class="mb-sm">Catatan</h4>
+                                        <p class="text-secondary">${c.notes}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Documents -->
+                        <div class="card mb-lg">
+                            <div class="card-header">
+                                <h3><i class="fas fa-folder-open mr-sm"></i> Dokumen (${documents.length})</h3>
+                                <a href="documents.html?case=${c.id}" class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-upload"></i> Upload
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                ${documents.length === 0 ? `
+                                    <div class="text-center p-lg text-secondary">
+                                        <i class="fas fa-folder-open" style="font-size: 2rem; color: var(--gray-300);"></i>
+                                        <p class="mt-md">Belum ada dokumen</p>
+                                    </div>
+                                ` : `
+                                    <div class="file-list">
+                                        ${documents.map(d => `
+                                            <div class="file-item">
+                                                <div class="file-icon">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </div>
+                                                <div class="file-info">
+                                                    <h5>${d.fileName}</h5>
+                                                    <p>${Utils.formatDate(d.uploadedAt)}</p>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+
+                        <!-- Schedules -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-calendar-alt mr-sm"></i> Jadwal (${schedules.length})</h3>
+                                <a href="schedule.html?case=${c.id}" class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-plus"></i> Tambah
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                ${schedules.length === 0 ? `
+                                    <div class="text-center p-lg text-secondary">
+                                        <i class="fas fa-calendar" style="font-size: 2rem; color: var(--gray-300);"></i>
+                                        <p class="mt-md">Belum ada jadwal</p>
+                                    </div>
+                                ` : `
+                                    ${schedules.sort((a, b) => new Date(a.startTime) - new Date(b.startTime)).map(s => `
+                                        <div class="d-flex gap-md p-md rounded mb-sm" style="background: var(--bg-tertiary);">
+                                            <div style="width: 50px; text-align: center;">
+                                                <div style="font-size: 1.25rem; font-weight: 700; color: var(--primary-navy);">
+                                                    ${new Date(s.startTime).getDate()}
+                                                </div>
+                                                <div class="text-sm text-secondary">
+                                                    ${new Date(s.startTime).toLocaleDateString('id-ID', { month: 'short' })}
+                                                </div>
+                                            </div>
+                                            <div style="flex: 1;">
+                                                <div class="font-medium">${s.title}</div>
+                                                <div class="text-sm text-secondary">
+                                                    ${Utils.formatTime(s.startTime)} ${s.location ? '• ' + s.location : ''}
+                                                </div>
+                                            </div>
+                                            <span class="badge badge-${s.eventType === 'hearing' ? 'danger' : s.eventType === 'meeting' ? 'info' : 'warning'}">
+                                                ${s.eventType}
+                                            </span>
+                                        </div>
+                                    `).join('')}
+                                `}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div>
+                        <!-- Client Info -->
+                        <div class="card mb-lg">
+                            <div class="card-header">
+                                <h3><i class="fas fa-user mr-sm"></i> Klien</h3>
+                            </div>
+                            <div class="card-body">
+                                ${client ? `
+                                    <div class="d-flex align-items-center gap-md mb-lg">
+                                        <div class="user-avatar avatar-lg" style="background: ${Utils.stringToColor(client.name)}">
+                                            ${client.companyType === 'corporate' ? '<i class="fas fa-building"></i>' : Utils.getInitials(client.name)}
+                                        </div>
+                                        <div>
+                                            <h4 class="mb-xs">${client.name}</h4>
+                                            <span class="badge ${client.companyType === 'corporate' ? 'badge-primary' : 'badge-info'}">
+                                                ${client.companyType === 'corporate' ? 'Korporasi' : 'Individual'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm">
+                                        <div class="mb-sm"><i class="fas fa-envelope text-secondary mr-sm"></i> ${client.email}</div>
+                                        <div class="mb-sm"><i class="fas fa-phone text-secondary mr-sm"></i> ${client.phone}</div>
+                                        ${client.contactPerson ? `<div><i class="fas fa-user text-secondary mr-sm"></i> ${client.contactPerson}</div>` : ''}
+                                    </div>
+                                ` : '<p class="text-secondary">Klien tidak ditemukan</p>'}
+                            </div>
+                        </div>
+
+                        <!-- Assigned Lawyers -->
+                        <div class="card mb-lg">
+                            <div class="card-header">
+                                <h3><i class="fas fa-users mr-sm"></i> Tim Lawyer</h3>
+                            </div>
+                            <div class="card-body">
+                                ${lawyers.length === 0 ? `
+                                    <p class="text-secondary text-center">Belum ada lawyer yang ditugaskan</p>
+                                ` : `
+                                    ${lawyers.map(l => `
+                                        <div class="d-flex align-items-center gap-md mb-md">
+                                            <div class="user-avatar" style="background: ${Utils.stringToColor(l.fullName)}">
+                                                ${Utils.getInitials(l.fullName)}
+                                            </div>
+                                            <div>
+                                                <div class="font-medium">${l.fullName}</div>
+                                                <div class="text-sm text-secondary">${Auth.getRoleLabel(l.role)}</div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                `}
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-info-circle mr-sm"></i> Info</h3>
+                            </div>
+                            <div class="card-body text-sm">
+                                <div class="d-flex justify-content-between mb-md">
+                                    <span class="text-secondary">Dibuat:</span>
+                                    <span>${Utils.formatDate(c.createdAt)}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-md">
+                                    <span class="text-secondary">Diupdate:</span>
+                                    <span>${Utils.formatDate(c.updatedAt)}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-md">
+                                    <span class="text-secondary">Dokumen:</span>
+                                    <span>${documents.length} file</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-secondary">Jadwal:</span>
+                                    <span>${schedules.length} event</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openProgressModal() {
+            document.getElementById('update-progress').value = currentCase.progress || 0;
+            document.getElementById('update-progress-value').textContent = (currentCase.progress || 0) + '%';
+            document.getElementById('update-status').value = currentCase.status;
+            document.getElementById('update-notes').value = '';
+            Utils.openModal('progress-modal');
+        }
+
+        function saveProgressUpdate() {
+            const progress = parseInt(document.getElementById('update-progress').value);
+            const status = document.getElementById('update-status').value;
+            const notes = document.getElementById('update-notes').value.trim();
+
+            const updates = { progress, status };
+            if (notes) {
+                updates.notes = (currentCase.notes ? currentCase.notes + '\n\n' : '') +
+                    `[${Utils.formatDate(new Date())}] ${notes}`;
+            }
+
+            DataManager.updateCase(currentCase.id, updates);
+            currentCase = DataManager.getCaseById(currentCase.id);
+
+            Utils.closeModal('progress-modal');
+            Utils.showToast('Progress berhasil diupdate', 'success');
+            renderCaseDetail();
+        }
+    </script>
+</body>
+
+</html>

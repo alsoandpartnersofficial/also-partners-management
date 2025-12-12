@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clients - Also and Partners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Logo" class="sidebar-logo" id="sidebar-logo">
+                <div class="sidebar-brand">
+                    <h2 id="sidebar-firm-name">Also and Partners</h2>
+                    <p>Advocates & Legal Consultants</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-menu-toggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <h1>Clients</h1>
+                </div>
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="notification-btn" onclick="App.toggleTheme()">
+                            <i id="theme-icon" class="fas fa-moon"></i>
+                        </button>
+                        <div class="dropdown">
+                            <div class="user-menu dropdown-trigger">
+                                <div class="user-avatar" id="header-avatar"></div>
+                                <div class="user-info">
+                                    <h4 id="header-user-name">User</h4>
+                                    <p id="header-user-role">Role</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                                    <i class="fas fa-user"></i><span>Profile</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="Auth.logout()">
+                                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <!-- Statistics -->
+                <div class="stats-grid mb-xl">
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                        <div class="stat-content">
+                            <h4>Total Klien</h4>
+                            <div class="stat-value" id="stat-total">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon gold"><i class="fas fa-building"></i></div>
+                        <div class="stat-content">
+                            <h4>Korporasi</h4>
+                            <div class="stat-value" id="stat-corporate">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fas fa-user"></i></div>
+                        <div class="stat-content">
+                            <h4>Individual</h4>
+                            <div class="stat-value" id="stat-individual">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="card mb-lg">
+                    <div class="card-body">
+                        <div class="filter-bar">
+                            <div class="header-search" style="flex: 1;">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-input" placeholder="Cari klien..." style="width: 100%;">
+                            </div>
+                            <select class="form-control" id="filter-type" style="width: 180px;">
+                                <option value="">Semua Tipe</option>
+                                <option value="corporate">Korporasi</option>
+                                <option value="individual">Individual</option>
+                            </select>
+                            <button class="btn btn-primary" id="btn-add-client" onclick="openAddModal()">
+                                <i class="fas fa-plus"></i> Tambah Klien
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clients Grid -->
+                <div class="d-grid gap-lg" id="clients-grid"
+                    style="grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Client Modal -->
+    <div class="modal-overlay" id="client-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Tambah Klien Baru</h3>
+                <button class="modal-close" onclick="Utils.closeModal('client-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="client-form">
+                    <input type="hidden" id="client-id">
+
+                    <div class="form-group">
+                        <label class="form-label required">Nama Klien</label>
+                        <input type="text" class="form-control" id="client-name" required
+                            placeholder="Nama perusahaan atau individu">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Tipe Klien</label>
+                            <select class="form-control" id="client-type" required>
+                                <option value="">Pilih Tipe</option>
+                                <option value="corporate">Korporasi</option>
+                                <option value="individual">Individual</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Contact Person</label>
+                            <input type="text" class="form-control" id="client-contact" placeholder="Nama kontak">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Email</label>
+                            <input type="email" class="form-control" id="client-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Telepon</label>
+                            <input type="tel" class="form-control" id="client-phone" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Alamat</label>
+                        <textarea class="form-control" id="client-address" rows="3"
+                            placeholder="Alamat lengkap"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="Utils.closeModal('client-modal')">Batal</button>
+                <button class="btn btn-primary" onclick="saveClient()">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Detail Modal -->
+    <div class="modal-overlay" id="detail-modal">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Detail Klien</h3>
+                <button class="modal-close" onclick="Utils.closeModal('detail-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="client-detail-content">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        if (!Auth.isLoggedIn()) {
+            window.location.href = 'index.html';
+        }
+
+        let currentEditId = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initPage();
+            renderClients();
+
+            // Check if should open add modal
+            if (Utils.getUrlParam('action') === 'new' && Auth.canManageClients()) {
+                openAddModal();
+            }
+
+            document.getElementById('search-input').addEventListener('input', Utils.debounce(renderClients, 300));
+            document.getElementById('filter-type').addEventListener('change', renderClients);
+
+            // Hide add button if user can't manage clients
+            if (!Auth.canManageClients()) {
+                document.getElementById('btn-add-client').style.display = 'none';
+            }
+        });
+
+        function initPage() {
+            const user = Auth.getCurrentUser();
+            const firm = DataManager.getFirmProfile();
+
+            document.getElementById('sidebar-logo').src = firm.logo;
+            document.getElementById('sidebar-firm-name').textContent = firm.firmName;
+            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
+            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+            document.getElementById('header-user-name').textContent = user.fullName;
+            document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
+
+            // Update stats
+            const clients = DataManager.getClients();
+            document.getElementById('stat-total').textContent = clients.length;
+            document.getElementById('stat-corporate').textContent = clients.filter(c => c.companyType === 'corporate').length;
+            document.getElementById('stat-individual').textContent = clients.filter(c => c.companyType === 'individual').length;
+        }
+
+        function renderClients() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const typeFilter = document.getElementById('filter-type').value;
+
+            let clients = DataManager.getClients();
+
+            if (search) {
+                clients = clients.filter(c =>
+                    c.name.toLowerCase().includes(search) ||
+                    c.email.toLowerCase().includes(search) ||
+                    (c.contactPerson && c.contactPerson.toLowerCase().includes(search))
+                );
+            }
+            if (typeFilter) {
+                clients = clients.filter(c => c.companyType === typeFilter);
+            }
+
+            const grid = document.getElementById('clients-grid');
+
+            if (clients.length === 0) {
+                grid.innerHTML = `
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <div class="card-body text-center p-xl">
+                            <i class="fas fa-users" style="font-size: 3rem; color: var(--gray-300); margin-bottom: 1rem;"></i>
+                            <h3 class="text-secondary">Tidak ada klien ditemukan</h3>
+                            ${Auth.canManageClients() ? `
+                                <button class="btn btn-primary mt-lg" onclick="openAddModal()">
+                                    <i class="fas fa-plus"></i> Tambah Klien Pertama
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = clients.map(client => {
+                const cases = DataManager.getCases().filter(c => c.clientId === client.id);
+                const activeCases = cases.filter(c => c.status === 'in_progress' || c.status === 'open').length;
+
+                return `
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start gap-md mb-lg">
+                                <div class="user-avatar avatar-lg" style="background: ${Utils.stringToColor(client.name)}">
+                                    ${client.companyType === 'corporate' ? '<i class="fas fa-building"></i>' : Utils.getInitials(client.name)}
+                                </div>
+                                <div style="flex: 1;">
+                                    <h4 class="mb-xs">${client.name}</h4>
+                                    <span class="badge ${client.companyType === 'corporate' ? 'badge-primary' : 'badge-info'}">
+                                        ${client.companyType === 'corporate' ? 'Korporasi' : 'Individual'}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="text-sm mb-md">
+                                <div class="d-flex align-items-center gap-sm mb-sm">
+                                    <i class="fas fa-envelope text-secondary" style="width: 16px;"></i>
+                                    <span>${client.email}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-sm mb-sm">
+                                    <i class="fas fa-phone text-secondary" style="width: 16px;"></i>
+                                    <span>${client.phone}</span>
+                                </div>
+                                ${client.contactPerson ? `
+                                    <div class="d-flex align-items-center gap-sm mb-sm">
+                                        <i class="fas fa-user text-secondary" style="width: 16px;"></i>
+                                        <span>${client.contactPerson}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="d-flex align-items-center gap-lg text-sm mb-lg">
+                                <div>
+                                    <span class="text-secondary">Total Kasus:</span>
+                                    <strong>${cases.length}</strong>
+                                </div>
+                                <div>
+                                    <span class="text-secondary">Aktif:</span>
+                                    <strong class="text-success">${activeCases}</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-sm">
+                                <button class="btn btn-sm btn-secondary" onclick="viewClient('${client.id}')" style="flex: 1;">
+                                    <i class="fas fa-eye"></i> Detail
+                                </button>
+                                ${Auth.canManageClients() ? `
+                                    <button class="btn btn-sm btn-secondary" onclick="editClient('${client.id}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary" onclick="deleteClient('${client.id}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openAddModal() {
+            if (!Auth.canManageClients()) {
+                Utils.showToast('Anda tidak memiliki akses untuk menambah klien', 'error');
+                return;
+            }
+
+            currentEditId = null;
+            document.getElementById('modal-title').textContent = 'Tambah Klien Baru';
+            document.getElementById('client-form').reset();
+            Utils.openModal('client-modal');
+        }
+
+        function editClient(id) {
+            if (!Auth.canManageClients()) {
+                Utils.showToast('Anda tidak memiliki akses untuk mengedit klien', 'error');
+                return;
+            }
+
+            const client = DataManager.getClientById(id);
+            if (!client) return;
+
+            currentEditId = id;
+            document.getElementById('modal-title').textContent = 'Edit Klien';
+            document.getElementById('client-id').value = client.id;
+            document.getElementById('client-name').value = client.name;
+            document.getElementById('client-type').value = client.companyType;
+            document.getElementById('client-contact').value = client.contactPerson || '';
+            document.getElementById('client-email').value = client.email;
+            document.getElementById('client-phone').value = client.phone;
+            document.getElementById('client-address').value = client.address || '';
+
+            Utils.openModal('client-modal');
+        }
+
+        function saveClient() {
+            const form = document.getElementById('client-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const user = Auth.getCurrentUser();
+            const clientData = {
+                name: document.getElementById('client-name').value.trim(),
+                companyType: document.getElementById('client-type').value,
+                contactPerson: document.getElementById('client-contact').value.trim(),
+                email: document.getElementById('client-email').value.trim(),
+                phone: document.getElementById('client-phone').value.trim(),
+                address: document.getElementById('client-address').value.trim()
+            };
+
+            if (currentEditId) {
+                DataManager.updateClient(currentEditId, clientData);
+                Utils.showToast('Klien berhasil diperbarui', 'success');
+            } else {
+                clientData.createdBy = user.id;
+                DataManager.addClient(clientData);
+                Utils.showToast('Klien berhasil ditambahkan', 'success');
+            }
+
+            Utils.closeModal('client-modal');
+            initPage();
+            renderClients();
+        }
+
+        async function deleteClient(id) {
+            if (!Auth.canManageClients()) {
+                Utils.showToast('Anda tidak memiliki akses untuk menghapus klien', 'error');
+                return;
+            }
+
+            const client = DataManager.getClientById(id);
+            if (!client) return;
+
+            // Check if client has cases
+            const cases = DataManager.getCases().filter(c => c.clientId === id);
+            if (cases.length > 0) {
+                Utils.showToast('Tidak dapat menghapus klien yang memiliki kasus', 'error');
+                return;
+            }
+
+            const confirmed = await Utils.confirm(
+                `Apakah Anda yakin ingin menghapus klien "${client.name}"?`,
+                'Hapus Klien'
+            );
+
+            if (confirmed) {
+                DataManager.deleteClient(id);
+                Utils.showToast('Klien berhasil dihapus', 'success');
+                initPage();
+                renderClients();
+            }
+        }
+
+        function viewClient(id) {
+            const client = DataManager.getClientById(id);
+            if (!client) return;
+
+            const cases = DataManager.getCases().filter(c => c.clientId === id);
+            const invoices = DataManager.getInvoices().filter(i => i.clientId === id);
+            const createdBy = DataManager.getUserById(client.createdBy);
+
+            document.getElementById('client-detail-content').innerHTML = `
+                <div class="d-flex align-items-center gap-lg mb-xl">
+                    <div class="user-avatar avatar-xl" style="background: ${Utils.stringToColor(client.name)}">
+                        ${client.companyType === 'corporate' ? '<i class="fas fa-building" style="font-size: 1.5rem;"></i>' : Utils.getInitials(client.name)}
+                    </div>
+                    <div>
+                        <h2 class="mb-xs">${client.name}</h2>
+                        <span class="badge ${client.companyType === 'corporate' ? 'badge-primary' : 'badge-info'}">
+                            ${client.companyType === 'corporate' ? 'Korporasi' : 'Individual'}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="stats-grid mb-lg" style="grid-template-columns: repeat(3, 1fr);">
+                    <div style="text-align: center; padding: 1rem; background: var(--bg-tertiary); border-radius: var(--radius-md);">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-navy);">${cases.length}</div>
+                        <div class="text-sm text-secondary">Total Kasus</div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: var(--bg-tertiary); border-radius: var(--radius-md);">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">${invoices.length}</div>
+                        <div class="text-sm text-secondary">Invoice</div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: var(--bg-tertiary); border-radius: var(--radius-md);">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-gold);">
+                            ${Utils.formatCurrency(invoices.reduce((sum, i) => sum + i.totalAmount, 0)).replace('Rp', '')}
+                        </div>
+                        <div class="text-sm text-secondary">Total Nilai</div>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <h4 class="mb-md">Informasi Kontak</h4>
+                <div class="mb-lg">
+                    <div class="d-flex align-items-center gap-md mb-md">
+                        <i class="fas fa-envelope text-secondary" style="width: 20px;"></i>
+                        <span>${client.email}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-md mb-md">
+                        <i class="fas fa-phone text-secondary" style="width: 20px;"></i>
+                        <span>${client.phone}</span>
+                    </div>
+                    ${client.contactPerson ? `
+                        <div class="d-flex align-items-center gap-md mb-md">
+                            <i class="fas fa-user text-secondary" style="width: 20px;"></i>
+                            <span>${client.contactPerson}</span>
+                        </div>
+                    ` : ''}
+                    ${client.address ? `
+                        <div class="d-flex align-items-start gap-md">
+                            <i class="fas fa-map-marker-alt text-secondary" style="width: 20px; margin-top: 4px;"></i>
+                            <span>${client.address}</span>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="text-sm text-secondary">
+                    <div>Ditambahkan oleh: ${createdBy?.fullName || 'Unknown'}</div>
+                    <div>Tanggal: ${Utils.formatDate(client.createdAt)}</div>
+                </div>
+            `;
+
+            Utils.openModal('detail-modal');
+        }
+    </script>
+</body>
+
+</html>

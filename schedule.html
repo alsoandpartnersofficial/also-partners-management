@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule - Also and Partners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Logo" class="sidebar-logo" id="sidebar-logo">
+                <div class="sidebar-brand">
+                    <h2 id="sidebar-firm-name">Also and Partners</h2>
+                    <p>Advocates & Legal Consultants</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-menu-toggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <h1>Schedule</h1>
+                </div>
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="notification-btn" onclick="App.toggleTheme()">
+                            <i id="theme-icon" class="fas fa-moon"></i>
+                        </button>
+                        <div class="dropdown">
+                            <div class="user-menu dropdown-trigger">
+                                <div class="user-avatar" id="header-avatar"></div>
+                                <div class="user-info">
+                                    <h4 id="header-user-name">User</h4>
+                                    <p id="header-user-role">Role</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                                    <i class="fas fa-user"></i><span>Profile</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="Auth.logout()">
+                                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="d-grid gap-lg" style="grid-template-columns: 1fr 350px;">
+                    <!-- Calendar -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="calendar-nav">
+                                <button onclick="prevMonth()"><i class="fas fa-chevron-left"></i></button>
+                                <h3 id="calendar-title" style="min-width: 180px; text-align: center;"></h3>
+                                <button onclick="nextMonth()"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                            <button class="btn btn-primary" onclick="openAddModal()">
+                                <i class="fas fa-plus"></i> Tambah Event
+                            </button>
+                        </div>
+                        <div id="calendar-grid" class="calendar-grid">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Sidebar - Upcoming Events -->
+                    <div>
+                        <div class="card mb-lg">
+                            <div class="card-header">
+                                <h3><i class="fas fa-calendar-day mr-sm"></i> Hari Ini</h3>
+                            </div>
+                            <div class="card-body" id="today-events">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-calendar-week mr-sm"></i> Mendatang</h3>
+                            </div>
+                            <div class="card-body" id="upcoming-events" style="max-height: 400px; overflow-y: auto;">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Schedule Modal -->
+    <div class="modal-overlay" id="schedule-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Tambah Event</h3>
+                <button class="modal-close" onclick="Utils.closeModal('schedule-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="schedule-form">
+                    <input type="hidden" id="schedule-id">
+
+                    <div class="form-group">
+                        <label class="form-label required">Judul</label>
+                        <input type="text" class="form-control" id="schedule-title" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Tipe</label>
+                            <select class="form-control" id="schedule-type" required>
+                                <option value="meeting">Meeting</option>
+                                <option value="hearing">Hearing/Sidang</option>
+                                <option value="deadline">Deadline</option>
+                                <option value="reminder">Reminder</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Kasus Terkait</label>
+                            <select class="form-control" id="schedule-case">
+                                <option value="">Tidak ada</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Tanggal & Waktu Mulai</label>
+                            <input type="datetime-local" class="form-control" id="schedule-start" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Waktu Selesai</label>
+                            <input type="datetime-local" class="form-control" id="schedule-end">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Lokasi</label>
+                        <input type="text" class="form-control" id="schedule-location"
+                            placeholder="Contoh: Pengadilan Negeri Jakarta">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Deskripsi</label>
+                        <textarea class="form-control" id="schedule-description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="Utils.closeModal('schedule-modal')">Batal</button>
+                <button class="btn btn-primary" onclick="saveSchedule()">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Detail Modal -->
+    <div class="modal-overlay" id="event-detail-modal">
+        <div class="modal" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Detail Event</h3>
+                <button class="modal-close" onclick="Utils.closeModal('event-detail-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="event-detail-content">
+                <!-- Populated by JS -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="btn-delete-event">
+                    <i class="fas fa-trash"></i> Hapus
+                </button>
+                <button class="btn btn-secondary" id="btn-edit-event">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-success" id="btn-complete-event">
+                    <i class="fas fa-check"></i> Selesai
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        if (!Auth.isLoggedIn()) {
+            window.location.href = 'index.html';
+        }
+
+        let currentDate = new Date();
+        let currentEditId = null;
+        let selectedEventId = null;
+
+        const eventTypeConfig = {
+            hearing: { icon: 'fas fa-gavel', color: 'var(--danger)', label: 'Hearing/Sidang' },
+            meeting: { icon: 'fas fa-handshake', color: 'var(--info)', label: 'Meeting' },
+            deadline: { icon: 'fas fa-clock', color: 'var(--warning)', label: 'Deadline' },
+            reminder: { icon: 'fas fa-bell', color: 'var(--success)', label: 'Reminder' }
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initPage();
+            populateCases();
+            renderCalendar();
+            renderTodayEvents();
+            renderUpcomingEvents();
+
+            if (Utils.getUrlParam('action') === 'new') {
+                openAddModal();
+            }
+        });
+
+        function initPage() {
+            const user = Auth.getCurrentUser();
+            const firm = DataManager.getFirmProfile();
+
+            document.getElementById('sidebar-logo').src = firm.logo;
+            document.getElementById('sidebar-firm-name').textContent = firm.firmName;
+            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
+            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+            document.getElementById('header-user-name').textContent = user.fullName;
+            document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
+        }
+
+        function populateCases() {
+            const caseSelect = document.getElementById('schedule-case');
+            const cases = DataManager.getCases().filter(c => c.status !== 'closed');
+            cases.forEach(c => {
+                caseSelect.innerHTML += `<option value="${c.id}">${c.caseNumber} - ${Utils.truncate(c.title, 30)}</option>`;
+            });
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            document.getElementById('calendar-title').textContent = currentDate.toLocaleDateString('id-ID', {
+                month: 'long',
+                year: 'numeric'
+            });
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDay = firstDay.getDay();
+            const totalDays = lastDay.getDate();
+
+            const user = Auth.getCurrentUser();
+            let schedules = DataManager.getSchedules();
+            if (!Auth.canViewAllCases()) {
+                schedules = schedules.filter(s => s.userId === user.id);
+            }
+
+            let html = `
+                <div class="calendar-day-header">Min</div>
+                <div class="calendar-day-header">Sen</div>
+                <div class="calendar-day-header">Sel</div>
+                <div class="calendar-day-header">Rab</div>
+                <div class="calendar-day-header">Kam</div>
+                <div class="calendar-day-header">Jum</div>
+                <div class="calendar-day-header">Sab</div>
+            `;
+
+            // Previous month days
+            const prevMonthDays = new Date(year, month, 0).getDate();
+            for (let i = startDay - 1; i >= 0; i--) {
+                html += `<div class="calendar-day other-month"><div class="calendar-day-number">${prevMonthDays - i}</div></div>`;
+            }
+
+            // Current month days
+            const today = new Date();
+            for (let day = 1; day <= totalDays; day++) {
+                const date = new Date(year, month, day);
+                const isToday = date.toDateString() === today.toDateString();
+                const daySchedules = schedules.filter(s => {
+                    const sDate = new Date(s.startTime);
+                    return sDate.getFullYear() === year && sDate.getMonth() === month && sDate.getDate() === day;
+                });
+
+                html += `
+                    <div class="calendar-day ${isToday ? 'today' : ''}" onclick="selectDate(${year}, ${month}, ${day})">
+                        <div class="calendar-day-number">${day}</div>
+                        ${daySchedules.slice(0, 3).map(s => `
+                            <div class="calendar-event ${s.eventType}" onclick="event.stopPropagation(); viewEvent('${s.id}')">
+                                ${Utils.truncate(s.title, 15)}
+                            </div>
+                        `).join('')}
+                        ${daySchedules.length > 3 ? `<div class="text-sm text-secondary">+${daySchedules.length - 3} lainnya</div>` : ''}
+                    </div>
+                `;
+            }
+
+            // Next month days
+            const remainingCells = 42 - (startDay + totalDays);
+            for (let i = 1; i <= remainingCells; i++) {
+                html += `<div class="calendar-day other-month"><div class="calendar-day-number">${i}</div></div>`;
+            }
+
+            document.getElementById('calendar-grid').innerHTML = html;
+        }
+
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function selectDate(year, month, day) {
+            const date = new Date(year, month, day);
+            document.getElementById('schedule-start').value = date.toISOString().slice(0, 16);
+            openAddModal();
+        }
+
+        function renderTodayEvents() {
+            const user = Auth.getCurrentUser();
+            const today = new Date();
+            let schedules = DataManager.getSchedules().filter(s => {
+                const sDate = new Date(s.startTime);
+                return sDate.toDateString() === today.toDateString();
+            });
+
+            if (!Auth.canViewAllCases()) {
+                schedules = schedules.filter(s => s.userId === user.id);
+            }
+
+            const container = document.getElementById('today-events');
+
+            if (schedules.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-md text-secondary">
+                        <i class="fas fa-calendar-check" style="font-size: 1.5rem; color: var(--gray-300);"></i>
+                        <p class="mt-sm">Tidak ada jadwal hari ini</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = schedules.map(s => {
+                const config = eventTypeConfig[s.eventType];
+                return `
+                    <div class="d-flex gap-md p-sm rounded mb-sm cursor-pointer" 
+                         style="background: var(--bg-tertiary);" 
+                         onclick="viewEvent('${s.id}')">
+                        <div style="width: 36px; height: 36px; border-radius: 8px; background: ${config.color}20; color: ${config.color}; display: flex; align-items: center; justify-content: center;">
+                            <i class="${config.icon}"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div class="font-medium text-sm">${s.title}</div>
+                            <div class="text-sm text-secondary">${Utils.formatTime(s.startTime)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderUpcomingEvents() {
+            const user = Auth.getCurrentUser();
+            const now = new Date();
+            let schedules = DataManager.getSchedules()
+                .filter(s => new Date(s.startTime) > now && !s.isCompleted)
+                .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+                .slice(0, 10);
+
+            if (!Auth.canViewAllCases()) {
+                schedules = schedules.filter(s => s.userId === user.id);
+            }
+
+            const container = document.getElementById('upcoming-events');
+
+            if (schedules.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-md text-secondary">
+                        <i class="fas fa-calendar" style="font-size: 1.5rem; color: var(--gray-300);"></i>
+                        <p class="mt-sm">Tidak ada jadwal mendatang</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = schedules.map(s => {
+                const config = eventTypeConfig[s.eventType];
+                return `
+                    <div class="d-flex gap-md p-sm rounded mb-sm cursor-pointer" 
+                         style="background: var(--bg-tertiary);" 
+                         onclick="viewEvent('${s.id}')">
+                        <div style="min-width: 45px; text-align: center;">
+                            <div style="font-weight: 700; color: var(--primary-navy);">
+                                ${new Date(s.startTime).getDate()}
+                            </div>
+                            <div class="text-sm text-secondary">
+                                ${new Date(s.startTime).toLocaleDateString('id-ID', { month: 'short' })}
+                            </div>
+                        </div>
+                        <div style="flex: 1;">
+                            <div class="font-medium text-sm">${s.title}</div>
+                            <div class="text-sm text-secondary">
+                                <i class="${config.icon} mr-sm" style="color: ${config.color};"></i>
+                                ${Utils.formatTime(s.startTime)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openAddModal() {
+            currentEditId = null;
+            document.getElementById('modal-title').textContent = 'Tambah Event';
+            document.getElementById('schedule-form').reset();
+
+            if (!document.getElementById('schedule-start').value) {
+                const now = new Date();
+                now.setHours(now.getHours() + 1, 0, 0, 0);
+                document.getElementById('schedule-start').value = now.toISOString().slice(0, 16);
+            }
+
+            Utils.openModal('schedule-modal');
+        }
+
+        function viewEvent(id) {
+            const schedule = DataManager.getScheduleById(id);
+            if (!schedule) return;
+
+            selectedEventId = id;
+            const config = eventTypeConfig[schedule.eventType];
+            const caseData = schedule.caseId ? DataManager.getCaseById(schedule.caseId) : null;
+
+            document.getElementById('event-detail-content').innerHTML = `
+                <div class="text-center mb-lg">
+                    <div style="width: 60px; height: 60px; border-radius: 12px; background: ${config.color}20; color: ${config.color}; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1rem;">
+                        <i class="${config.icon}"></i>
+                    </div>
+                    <h3 class="mb-sm">${schedule.title}</h3>
+                    <span class="badge" style="background: ${config.color}20; color: ${config.color};">${config.label}</span>
+                    ${schedule.isCompleted ? '<span class="badge badge-success ml-sm">Selesai</span>' : ''}
+                </div>
+                
+                <div class="mb-lg">
+                    <div class="d-flex align-items-center gap-md mb-md">
+                        <i class="fas fa-calendar text-secondary" style="width: 20px;"></i>
+                        <span>${Utils.formatDate(schedule.startTime)}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-md mb-md">
+                        <i class="fas fa-clock text-secondary" style="width: 20px;"></i>
+                        <span>${Utils.formatTime(schedule.startTime)}${schedule.endTime ? ' - ' + Utils.formatTime(schedule.endTime) : ''}</span>
+                    </div>
+                    ${schedule.location ? `
+                        <div class="d-flex align-items-center gap-md mb-md">
+                            <i class="fas fa-map-marker-alt text-secondary" style="width: 20px;"></i>
+                            <span>${schedule.location}</span>
+                        </div>
+                    ` : ''}
+                    ${caseData ? `
+                        <div class="d-flex align-items-center gap-md mb-md">
+                            <i class="fas fa-briefcase text-secondary" style="width: 20px;"></i>
+                            <a href="case-detail.html?id=${caseData.id}">${caseData.caseNumber}</a>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                ${schedule.description ? `
+                    <div class="p-md rounded" style="background: var(--bg-tertiary);">
+                        <p class="m-0">${schedule.description}</p>
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('btn-complete-event').style.display = schedule.isCompleted ? 'none' : '';
+
+            document.getElementById('btn-delete-event').onclick = () => deleteEvent(id);
+            document.getElementById('btn-edit-event').onclick = () => editEvent(id);
+            document.getElementById('btn-complete-event').onclick = () => completeEvent(id);
+
+            Utils.openModal('event-detail-modal');
+        }
+
+        function editEvent(id) {
+            const schedule = DataManager.getScheduleById(id);
+            if (!schedule) return;
+
+            Utils.closeModal('event-detail-modal');
+
+            currentEditId = id;
+            document.getElementById('modal-title').textContent = 'Edit Event';
+            document.getElementById('schedule-id').value = schedule.id;
+            document.getElementById('schedule-title').value = schedule.title;
+            document.getElementById('schedule-type').value = schedule.eventType;
+            document.getElementById('schedule-case').value = schedule.caseId || '';
+            document.getElementById('schedule-start').value = schedule.startTime.slice(0, 16);
+            document.getElementById('schedule-end').value = schedule.endTime ? schedule.endTime.slice(0, 16) : '';
+            document.getElementById('schedule-location').value = schedule.location || '';
+            document.getElementById('schedule-description').value = schedule.description || '';
+
+            Utils.openModal('schedule-modal');
+        }
+
+        function saveSchedule() {
+            const form = document.getElementById('schedule-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const user = Auth.getCurrentUser();
+            const scheduleData = {
+                title: document.getElementById('schedule-title').value.trim(),
+                eventType: document.getElementById('schedule-type').value,
+                caseId: document.getElementById('schedule-case').value || null,
+                startTime: new Date(document.getElementById('schedule-start').value).toISOString(),
+                endTime: document.getElementById('schedule-end').value ?
+                    new Date(document.getElementById('schedule-end').value).toISOString() : null,
+                location: document.getElementById('schedule-location').value.trim(),
+                description: document.getElementById('schedule-description').value.trim(),
+                userId: user.id,
+                isCompleted: false
+            };
+
+            if (currentEditId) {
+                DataManager.updateSchedule(currentEditId, scheduleData);
+                Utils.showToast('Event berhasil diperbarui', 'success');
+            } else {
+                DataManager.addSchedule(scheduleData);
+                Utils.showToast('Event berhasil ditambahkan', 'success');
+            }
+
+            Utils.closeModal('schedule-modal');
+            renderCalendar();
+            renderTodayEvents();
+            renderUpcomingEvents();
+        }
+
+        async function deleteEvent(id) {
+            Utils.closeModal('event-detail-modal');
+
+            const confirmed = await Utils.confirm('Apakah Anda yakin ingin menghapus event ini?', 'Hapus Event');
+            if (confirmed) {
+                DataManager.deleteSchedule(id);
+                Utils.showToast('Event berhasil dihapus', 'success');
+                renderCalendar();
+                renderTodayEvents();
+                renderUpcomingEvents();
+            }
+        }
+
+        function completeEvent(id) {
+            DataManager.updateSchedule(id, { isCompleted: true });
+            Utils.closeModal('event-detail-modal');
+            Utils.showToast('Event ditandai selesai', 'success');
+            renderCalendar();
+            renderTodayEvents();
+            renderUpcomingEvents();
+        }
+    </script>
+</body>
+
+</html>

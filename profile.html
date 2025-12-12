@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Also and Partners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Logo" class="sidebar-logo" id="sidebar-logo">
+                <div class="sidebar-brand">
+                    <h2 id="sidebar-firm-name">Also and Partners</h2>
+                    <p>Advocates & Legal Consultants</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-menu-toggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <h1>My Profile</h1>
+                </div>
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="notification-btn" onclick="App.toggleTheme()">
+                            <i id="theme-icon" class="fas fa-moon"></i>
+                        </button>
+                        <div class="dropdown">
+                            <div class="user-menu dropdown-trigger">
+                                <div class="user-avatar" id="header-avatar"></div>
+                                <div class="user-info">
+                                    <h4 id="header-user-name">User</h4>
+                                    <p id="header-user-role">Role</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                                    <i class="fas fa-user"></i><span>Profile</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="Auth.logout()">
+                                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="d-grid gap-xl" style="grid-template-columns: 350px 1fr;">
+                    <!-- Profile Card -->
+                    <div>
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <div id="profile-avatar" class="user-avatar avatar-xl mx-auto mb-lg"
+                                    style="width: 120px; height: 120px; font-size: 2.5rem;"></div>
+                                <h2 id="profile-name" style="font-family: var(--font-heading); margin-bottom: 0.25rem;">
+                                </h2>
+                                <p id="profile-role" class="text-secondary mb-lg"></p>
+
+                                <div class="d-flex justify-content-center gap-lg mb-lg">
+                                    <div class="text-center">
+                                        <div id="stat-cases"
+                                            style="font-size: 1.5rem; font-weight: 700; color: var(--primary-navy);">0
+                                        </div>
+                                        <div class="text-sm text-secondary">Kasus</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div id="stat-schedules"
+                                            style="font-size: 1.5rem; font-weight: 700; color: var(--accent-gold);">0
+                                        </div>
+                                        <div class="text-sm text-secondary">Schedule</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div id="stat-docs"
+                                            style="font-size: 1.5rem; font-weight: 700; color: var(--success);">0</div>
+                                        <div class="text-sm text-secondary">Dokumen</div>
+                                    </div>
+                                </div>
+
+                                <div class="divider"></div>
+
+                                <div class="text-left">
+                                    <div class="d-flex align-items-center gap-md mb-md">
+                                        <i class="fas fa-envelope text-secondary" style="width: 20px;"></i>
+                                        <span id="profile-email"></span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-md mb-md">
+                                        <i class="fas fa-phone text-secondary" style="width: 20px;"></i>
+                                        <span id="profile-phone"></span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-md">
+                                        <i class="fas fa-calendar text-secondary" style="width: 20px;"></i>
+                                        <span id="profile-joined"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Settings -->
+                    <div>
+                        <!-- Personal Information -->
+                        <div class="card mb-lg">
+                            <div class="card-header">
+                                <h3><i class="fas fa-user mr-sm"></i> Informasi Personal</h3>
+                            </div>
+                            <div class="card-body">
+                                <form id="profile-form">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label required">Nama Lengkap</label>
+                                            <input type="text" class="form-control" id="edit-name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Username</label>
+                                            <input type="text" class="form-control" id="edit-username" disabled>
+                                            <p class="form-hint">Username tidak dapat diubah</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label required">Email</label>
+                                            <input type="email" class="form-control" id="edit-email" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Telepon</label>
+                                            <input type="tel" class="form-control" id="edit-phone">
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Simpan Perubahan
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Change Password -->
+                        <div class="card mb-lg">
+                            <div class="card-header">
+                                <h3><i class="fas fa-key mr-sm"></i> Ubah Password</h3>
+                            </div>
+                            <div class="card-body">
+                                <form id="password-form">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label required">Password Saat Ini</label>
+                                            <input type="password" class="form-control" id="current-password" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label required">Password Baru</label>
+                                            <input type="password" class="form-control" id="new-password" required
+                                                minlength="6">
+                                            <p class="form-hint">Minimal 6 karakter</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label required">Konfirmasi Password Baru</label>
+                                        <input type="password" class="form-control" id="confirm-password" required>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-gold">
+                                            <i class="fas fa-lock"></i> Ubah Password
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Preferences -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-cog mr-sm"></i> Preferensi</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-lg">
+                                    <div>
+                                        <h4 class="mb-xs">Dark Mode</h4>
+                                        <p class="text-sm text-secondary m-0">Gunakan tema gelap</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="pref-dark-mode" onchange="toggleDarkMode()">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-lg">
+                                    <div>
+                                        <h4 class="mb-xs">Notifikasi Email</h4>
+                                        <p class="text-sm text-secondary m-0">Terima notifikasi via email</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="pref-email-notif" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h4 class="mb-xs">Reminder Jadwal</h4>
+                                        <p class="text-sm text-secondary m-0">Ingatkan saya sebelum jadwal</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="pref-reminder" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gray-300);
+            transition: .3s;
+            border-radius: 28px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background: linear-gradient(135deg, var(--primary-navy), var(--accent-gold));
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(22px);
+        }
+    </style>
+
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        if (!Auth.isLoggedIn()) {
+            window.location.href = 'index.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initPage();
+            loadProfileData();
+
+            document.getElementById('profile-form').addEventListener('submit', saveProfile);
+            document.getElementById('password-form').addEventListener('submit', changePassword);
+
+            // Load dark mode preference
+            const theme = DataManager.getTheme();
+            document.getElementById('pref-dark-mode').checked = theme === 'dark';
+        });
+
+        function initPage() {
+            const user = Auth.getCurrentUser();
+            const firm = DataManager.getFirmProfile();
+
+            document.getElementById('sidebar-logo').src = firm.logo;
+            document.getElementById('sidebar-firm-name').textContent = firm.firmName;
+            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
+            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+            document.getElementById('header-user-name').textContent = user.fullName;
+            document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
+        }
+
+        function loadProfileData() {
+            const user = Auth.getCurrentUser();
+
+            // Profile card
+            const avatar = document.getElementById('profile-avatar');
+            avatar.textContent = Utils.getInitials(user.fullName);
+            avatar.style.background = Utils.stringToColor(user.fullName);
+
+            document.getElementById('profile-name').textContent = user.fullName;
+            document.getElementById('profile-role').textContent = Auth.getRoleLabel(user.role);
+            document.getElementById('profile-email').textContent = user.email;
+            document.getElementById('profile-phone').textContent = user.phone || '-';
+            document.getElementById('profile-joined').textContent = `Bergabung: ${Utils.formatDate(user.createdAt)}`;
+
+            // Stats
+            const cases = DataManager.getCases().filter(c =>
+                c.assignedLawyers && c.assignedLawyers.includes(user.id)
+            );
+            const schedules = DataManager.getSchedules().filter(s => s.userId === user.id);
+            const docs = DataManager.getDocuments().filter(d => d.uploadedBy === user.id);
+
+            document.getElementById('stat-cases').textContent = cases.length;
+            document.getElementById('stat-schedules').textContent = schedules.length;
+            document.getElementById('stat-docs').textContent = docs.length;
+
+            // Edit form
+            document.getElementById('edit-name').value = user.fullName;
+            document.getElementById('edit-username').value = user.username;
+            document.getElementById('edit-email').value = user.email;
+            document.getElementById('edit-phone').value = user.phone || '';
+        }
+
+        function saveProfile(e) {
+            e.preventDefault();
+
+            const user = Auth.getCurrentUser();
+            const updates = {
+                fullName: document.getElementById('edit-name').value.trim(),
+                email: document.getElementById('edit-email').value.trim(),
+                phone: document.getElementById('edit-phone').value.trim()
+            };
+
+            DataManager.updateUser(user.id, updates);
+
+            // Update session
+            const updatedUser = DataManager.getUserById(user.id);
+            DataManager.saveCurrentUser(updatedUser);
+
+            Utils.showToast('Profil berhasil diperbarui', 'success');
+
+            // Refresh display
+            initPage();
+            loadProfileData();
+        }
+
+        function changePassword(e) {
+            e.preventDefault();
+
+            const user = Auth.getCurrentUser();
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            // Verify current password
+            if (currentPassword !== user.password) {
+                Utils.showToast('Password saat ini tidak sesuai', 'error');
+                return;
+            }
+
+            // Verify new password match
+            if (newPassword !== confirmPassword) {
+                Utils.showToast('Konfirmasi password tidak sesuai', 'error');
+                return;
+            }
+
+            // Verify minimum length
+            if (newPassword.length < 6) {
+                Utils.showToast('Password minimal 6 karakter', 'error');
+                return;
+            }
+
+            // Update password
+            DataManager.updateUser(user.id, { password: newPassword });
+
+            // Update session
+            const updatedUser = DataManager.getUserById(user.id);
+            DataManager.saveCurrentUser(updatedUser);
+
+            Utils.showToast('Password berhasil diubah', 'success');
+
+            // Clear form
+            document.getElementById('password-form').reset();
+        }
+
+        function toggleDarkMode() {
+            App.toggleTheme();
+            document.getElementById('pref-dark-mode').checked = DataManager.getTheme() === 'dark';
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firm Settings - Also and Partners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Logo" class="sidebar-logo" id="sidebar-logo">
+                <div class="sidebar-brand">
+                    <h2 id="sidebar-firm-name">Also and Partners</h2>
+                    <p>Advocates & Legal Consultants</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-menu-toggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <h1>Firm Settings</h1>
+                </div>
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="notification-btn" onclick="App.toggleTheme()">
+                            <i id="theme-icon" class="fas fa-moon"></i>
+                        </button>
+                        <div class="dropdown">
+                            <div class="user-menu dropdown-trigger">
+                                <div class="user-avatar" id="header-avatar"></div>
+                                <div class="user-info">
+                                    <h4 id="header-user-name">User</h4>
+                                    <p id="header-user-role">Role</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                                    <i class="fas fa-user"></i><span>Profile</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="Auth.logout()">
+                                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="d-grid gap-lg" style="grid-template-columns: 350px 1fr;">
+                    <!-- Logo Section -->
+                    <div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-image mr-sm"></i> Logo Perusahaan</h3>
+                            </div>
+                            <div class="card-body text-center">
+                                <div id="logo-preview"
+                                    style="width: 180px; height: 180px; margin: 0 auto 1.5rem; border-radius: 16px; border: 3px dashed var(--gray-300); display: flex; align-items: center; justify-content: center; overflow: hidden; background: var(--bg-tertiary);">
+                                    <img id="current-logo" src="" alt="Logo"
+                                        style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                </div>
+
+                                <div class="file-upload" style="padding: 1rem;">
+                                    <i class="fas fa-cloud-upload-alt"
+                                        style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                                    <p class="text-sm">Upload logo baru</p>
+                                    <p class="text-sm text-secondary">PNG, JPG, SVG (Max 2MB)</p>
+                                    <input type="file" id="logo-input" accept="image/*">
+                                </div>
+
+                                <button class="btn btn-secondary btn-sm mt-md" onclick="resetLogo()">
+                                    <i class="fas fa-undo"></i> Reset ke Default
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- API Settings -->
+                        <div class="card mt-lg">
+                            <div class="card-header">
+                                <h3><i class="fas fa-key mr-sm"></i> API Settings</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label class="form-label">Google Gemini API Key</label>
+                                    <input type="password" class="form-control" id="gemini-api-key"
+                                        placeholder="Masukkan API Key">
+                                    <p class="form-hint">Untuk fitur AI Legal Search</p>
+                                </div>
+                                <button class="btn btn-primary" onclick="saveApiKey()">
+                                    <i class="fas fa-save"></i> Simpan API Key
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Firm Details -->
+                    <div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-building mr-sm"></i> Informasi Kantor Hukum</h3>
+                            </div>
+                            <div class="card-body">
+                                <form id="firm-form">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label required">Nama Kantor Hukum</label>
+                                            <input type="text" class="form-control" id="firm-name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Tagline</label>
+                                            <input type="text" class="form-control" id="firm-tagline"
+                                                placeholder="Contoh: Advocates & Legal Consultants">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Alamat</label>
+                                        <textarea class="form-control" id="firm-address" rows="2"></textarea>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="firm-email">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Telepon</label>
+                                            <input type="tel" class="form-control" id="firm-phone">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Fax</label>
+                                            <input type="tel" class="form-control" id="firm-fax">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Website</label>
+                                            <input type="url" class="form-control" id="firm-website"
+                                                placeholder="https://">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Bank Details -->
+                        <div class="card mt-lg">
+                            <div class="card-header">
+                                <h3><i class="fas fa-university mr-sm"></i> Informasi Bank</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Nama Bank</label>
+                                        <input type="text" class="form-control" id="bank-name"
+                                            placeholder="Contoh: Bank Central Asia (BCA)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">No. Rekening</label>
+                                        <input type="text" class="form-control" id="bank-account">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Atas Nama</label>
+                                    <input type="text" class="form-control" id="bank-holder">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Invoice Settings -->
+                        <div class="card mt-lg">
+                            <div class="card-header">
+                                <h3><i class="fas fa-file-invoice mr-sm"></i> Pengaturan Invoice</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Prefix Nomor Invoice</label>
+                                        <input type="text" class="form-control" id="invoice-prefix" placeholder="INV">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Default Jatuh Tempo (hari)</label>
+                                        <input type="number" class="form-control" id="invoice-due-days" value="30"
+                                            min="1">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Syarat & Ketentuan Default</label>
+                                    <textarea class="form-control" id="invoice-terms" rows="3"
+                                        placeholder="Contoh: Pembayaran dalam 30 hari dari tanggal invoice."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Save Button -->
+                        <div class="mt-lg d-flex justify-content-end gap-md">
+                            <button class="btn btn-secondary" onclick="loadFirmData()">
+                                <i class="fas fa-undo"></i> Reset
+                            </button>
+                            <button class="btn btn-primary" onclick="saveFirmSettings()">
+                                <i class="fas fa-save"></i> Simpan Pengaturan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        if (!Auth.isLoggedIn()) {
+            window.location.href = 'index.html';
+        }
+        if (!Auth.canManageFirmSettings()) {
+            window.location.href = 'dashboard.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initPage();
+            loadFirmData();
+            loadApiKey();
+
+            // Logo upload handler
+            document.getElementById('logo-input').addEventListener('change', handleLogoUpload);
+        });
+
+        function initPage() {
+            const user = Auth.getCurrentUser();
+            const firm = DataManager.getFirmProfile();
+
+            document.getElementById('sidebar-logo').src = firm.logo;
+            document.getElementById('sidebar-firm-name').textContent = firm.firmName;
+            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
+            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+            document.getElementById('header-user-name').textContent = user.fullName;
+            document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
+        }
+
+        function loadFirmData() {
+            const firm = DataManager.getFirmProfile();
+
+            document.getElementById('current-logo').src = firm.logo;
+            document.getElementById('firm-name').value = firm.firmName || '';
+            document.getElementById('firm-tagline').value = firm.tagline || 'Advocates & Legal Consultants';
+            document.getElementById('firm-address').value = firm.address || '';
+            document.getElementById('firm-email').value = firm.email || '';
+            document.getElementById('firm-phone').value = firm.phone || '';
+            document.getElementById('firm-fax').value = firm.fax || '';
+            document.getElementById('firm-website').value = firm.website || '';
+            document.getElementById('bank-name').value = firm.bankName || '';
+            document.getElementById('bank-account').value = firm.bankAccount || '';
+            document.getElementById('bank-holder').value = firm.bankHolder || '';
+            document.getElementById('invoice-prefix').value = firm.invoicePrefix || 'INV';
+            document.getElementById('invoice-due-days').value = firm.invoiceDueDays || 30;
+            document.getElementById('invoice-terms').value = firm.invoiceTerms || '';
+        }
+
+        function loadApiKey() {
+            const apiKey = localStorage.getItem('gemini_api_key') || '';
+            document.getElementById('gemini-api-key').value = apiKey;
+        }
+
+        async function handleLogoUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                Utils.showToast('Ukuran file maksimal 2MB', 'error');
+                return;
+            }
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                Utils.showToast('File harus berupa gambar', 'error');
+                return;
+            }
+
+            try {
+                const base64 = await Utils.fileToBase64(file);
+                document.getElementById('current-logo').src = base64;
+
+                // Save immediately
+                const firm = DataManager.getFirmProfile();
+                firm.logo = base64;
+                DataManager.saveFirmProfile(firm);
+
+                // Update sidebar
+                document.getElementById('sidebar-logo').src = base64;
+
+                Utils.showToast('Logo berhasil diupload', 'success');
+            } catch (error) {
+                Utils.showToast('Gagal mengupload logo', 'error');
+            }
+        }
+
+        function resetLogo() {
+            const defaultLogo = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iMTIiIGZpbGw9IiMxRTNBNUYiLz4KPHBhdGggZD0iTTI1IDc1VjMwTDUwIDIwTDc1IDMwVjc1IiBzdHJva2U9IiNENEFGMzciIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxwYXRoIGQ9Ik01MCAyMFY1NSIgc3Ryb2tlPSIjRDRBRjM3IiBzdHJva2Utd2lkdGg9IjQiLz4KPGNpcmNsZSBjeD0iNTAiIGN5PSI2NSIgcj0iOCIgZmlsbD0iI0Q0QUYzNyIvPgo8L3N2Zz4K';
+
+            document.getElementById('current-logo').src = defaultLogo;
+
+            const firm = DataManager.getFirmProfile();
+            firm.logo = defaultLogo;
+            DataManager.saveFirmProfile(firm);
+            document.getElementById('sidebar-logo').src = defaultLogo;
+
+            Utils.showToast('Logo direset ke default', 'success');
+        }
+
+        function saveFirmSettings() {
+            const firmName = document.getElementById('firm-name').value.trim();
+            if (!firmName) {
+                Utils.showToast('Nama kantor hukum wajib diisi', 'error');
+                return;
+            }
+
+            const firm = DataManager.getFirmProfile();
+
+            firm.firmName = firmName;
+            firm.tagline = document.getElementById('firm-tagline').value.trim();
+            firm.address = document.getElementById('firm-address').value.trim();
+            firm.email = document.getElementById('firm-email').value.trim();
+            firm.phone = document.getElementById('firm-phone').value.trim();
+            firm.fax = document.getElementById('firm-fax').value.trim();
+            firm.website = document.getElementById('firm-website').value.trim();
+            firm.bankName = document.getElementById('bank-name').value.trim();
+            firm.bankAccount = document.getElementById('bank-account').value.trim();
+            firm.bankHolder = document.getElementById('bank-holder').value.trim();
+            firm.invoicePrefix = document.getElementById('invoice-prefix').value.trim() || 'INV';
+            firm.invoiceDueDays = parseInt(document.getElementById('invoice-due-days').value) || 30;
+            firm.invoiceTerms = document.getElementById('invoice-terms').value.trim();
+
+            DataManager.saveFirmProfile(firm);
+
+            // Update sidebar
+            document.getElementById('sidebar-firm-name').textContent = firm.firmName;
+
+            Utils.showToast('Pengaturan berhasil disimpan', 'success');
+        }
+
+        function saveApiKey() {
+            const apiKey = document.getElementById('gemini-api-key').value.trim();
+            if (apiKey) {
+                localStorage.setItem('gemini_api_key', apiKey);
+                Utils.showToast('API Key berhasil disimpan', 'success');
+            } else {
+                localStorage.removeItem('gemini_api_key');
+                Utils.showToast('API Key dihapus', 'info');
+            }
+        }
+    </script>
+</body>
+
+</html>

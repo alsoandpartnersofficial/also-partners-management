@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documents - Also and Partners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="" alt="Logo" class="sidebar-logo" id="sidebar-logo">
+                <div class="sidebar-brand">
+                    <h2 id="sidebar-firm-name">Also and Partners</h2>
+                    <p>Advocates & Legal Consultants</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button id="mobile-menu-toggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <h1>Documents</h1>
+                </div>
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="notification-btn" onclick="App.toggleTheme()">
+                            <i id="theme-icon" class="fas fa-moon"></i>
+                        </button>
+                        <div class="dropdown">
+                            <div class="user-menu dropdown-trigger">
+                                <div class="user-avatar" id="header-avatar"></div>
+                                <div class="user-info">
+                                    <h4 id="header-user-name">User</h4>
+                                    <p id="header-user-role">Role</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                                    <i class="fas fa-user"></i><span>Profile</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="Auth.logout()">
+                                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <!-- Upload Area -->
+                <div class="card mb-lg">
+                    <div class="card-body">
+                        <div class="file-upload" id="upload-area">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h4>Drag & Drop file disini</h4>
+                            <p class="text-secondary">atau klik untuk memilih file</p>
+                            <input type="file" id="file-input" multiple
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                        </div>
+                        <div id="upload-preview" class="file-list mt-lg" style="display: none;">
+                            <!-- Preview files here -->
+                        </div>
+                        <div id="upload-form" style="display: none;" class="mt-lg">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Kasus Terkait</label>
+                                    <select class="form-control" id="doc-case">
+                                        <option value="">Tidak ada</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Kategori</label>
+                                    <select class="form-control" id="doc-category">
+                                        <option value="contract">Kontrak</option>
+                                        <option value="evidence">Bukti</option>
+                                        <option value="correspondence">Korespondensi</option>
+                                        <option value="court">Dokumen Pengadilan</option>
+                                        <option value="other">Lainnya</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Deskripsi</label>
+                                <input type="text" class="form-control" id="doc-description"
+                                    placeholder="Deskripsi singkat dokumen">
+                            </div>
+                            <button class="btn btn-primary" onclick="uploadFiles()">
+                                <i class="fas fa-upload"></i> Upload Dokumen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="card mb-lg">
+                    <div class="card-body">
+                        <div class="filter-bar">
+                            <div class="header-search" style="flex: 1;">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-input" placeholder="Cari dokumen..." style="width: 100%;">
+                            </div>
+                            <select class="form-control" id="filter-case" style="width: 200px;">
+                                <option value="">Semua Kasus</option>
+                            </select>
+                            <select class="form-control" id="filter-category" style="width: 180px;">
+                                <option value="">Semua Kategori</option>
+                                <option value="contract">Kontrak</option>
+                                <option value="evidence">Bukti</option>
+                                <option value="correspondence">Korespondensi</option>
+                                <option value="court">Dokumen Pengadilan</option>
+                                <option value="other">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents Grid -->
+                <div class="d-grid gap-lg" id="documents-grid"
+                    style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        if (!Auth.isLoggedIn()) {
+            window.location.href = 'index.html';
+        }
+
+        let selectedFiles = [];
+
+        const categoryConfig = {
+            contract: { icon: 'fas fa-file-contract', color: 'var(--primary-navy)', label: 'Kontrak' },
+            evidence: { icon: 'fas fa-file-alt', color: 'var(--warning)', label: 'Bukti' },
+            correspondence: { icon: 'fas fa-envelope', color: 'var(--info)', label: 'Korespondensi' },
+            court: { icon: 'fas fa-gavel', color: 'var(--danger)', label: 'Dokumen Pengadilan' },
+            other: { icon: 'fas fa-file', color: 'var(--gray-500)', label: 'Lainnya' }
+        };
+
+        const fileTypeIcons = {
+            pdf: { icon: 'fas fa-file-pdf', color: '#E74C3C' },
+            doc: { icon: 'fas fa-file-word', color: '#2B579A' },
+            docx: { icon: 'fas fa-file-word', color: '#2B579A' },
+            xls: { icon: 'fas fa-file-excel', color: '#217346' },
+            xlsx: { icon: 'fas fa-file-excel', color: '#217346' },
+            jpg: { icon: 'fas fa-file-image', color: '#9B59B6' },
+            jpeg: { icon: 'fas fa-file-image', color: '#9B59B6' },
+            png: { icon: 'fas fa-file-image', color: '#9B59B6' },
+            default: { icon: 'fas fa-file', color: 'var(--gray-500)' }
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initPage();
+            populateCases();
+            renderDocuments();
+
+            // File input handlers
+            const fileInput = document.getElementById('file-input');
+            const uploadArea = document.getElementById('upload-area');
+
+            fileInput.addEventListener('change', handleFileSelect);
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'var(--primary-navy)';
+                uploadArea.style.background = 'var(--bg-tertiary)';
+            });
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = '';
+                uploadArea.style.background = '';
+            });
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '';
+                uploadArea.style.background = '';
+                handleFileSelect({ target: { files: e.dataTransfer.files } });
+            });
+
+            document.getElementById('search-input').addEventListener('input', Utils.debounce(renderDocuments, 300));
+            document.getElementById('filter-case').addEventListener('change', renderDocuments);
+            document.getElementById('filter-category').addEventListener('change', renderDocuments);
+
+            // Pre-select case from URL
+            const caseId = Utils.getUrlParam('case');
+            if (caseId) {
+                document.getElementById('doc-case').value = caseId;
+            }
+        });
+
+        function initPage() {
+            const user = Auth.getCurrentUser();
+            const firm = DataManager.getFirmProfile();
+
+            document.getElementById('sidebar-logo').src = firm.logo;
+            document.getElementById('sidebar-firm-name').textContent = firm.firmName;
+            document.getElementById('header-avatar').textContent = Utils.getInitials(user.fullName);
+            document.getElementById('header-avatar').style.background = Utils.stringToColor(user.fullName);
+            document.getElementById('header-user-name').textContent = user.fullName;
+            document.getElementById('header-user-role').textContent = Auth.getRoleLabel(user.role);
+        }
+
+        function populateCases() {
+            const cases = DataManager.getCases();
+            const docCaseSelect = document.getElementById('doc-case');
+            const filterCaseSelect = document.getElementById('filter-case');
+
+            cases.forEach(c => {
+                const option = `<option value="${c.id}">${c.caseNumber} - ${Utils.truncate(c.title, 25)}</option>`;
+                docCaseSelect.innerHTML += option;
+                filterCaseSelect.innerHTML += option;
+            });
+        }
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            selectedFiles = files;
+
+            const preview = document.getElementById('upload-preview');
+            preview.style.display = 'block';
+            preview.innerHTML = files.map((file, index) => {
+                const ext = file.name.split('.').pop().toLowerCase();
+                const typeConfig = fileTypeIcons[ext] || fileTypeIcons.default;
+
+                return `
+                    <div class="file-item">
+                        <div class="file-icon" style="background: ${typeConfig.color};">
+                            <i class="${typeConfig.icon}"></i>
+                        </div>
+                        <div class="file-info">
+                            <h5>${file.name}</h5>
+                            <p>${Utils.formatFileSize(file.size)}</p>
+                        </div>
+                        <button class="icon-btn danger" onclick="removeFile(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('upload-form').style.display = 'block';
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            if (selectedFiles.length === 0) {
+                document.getElementById('upload-preview').style.display = 'none';
+                document.getElementById('upload-form').style.display = 'none';
+                document.getElementById('file-input').value = '';
+            } else {
+                handleFileSelect({ target: { files: selectedFiles } });
+            }
+        }
+
+        async function uploadFiles() {
+            if (selectedFiles.length === 0) {
+                Utils.showToast('Pilih file terlebih dahulu', 'error');
+                return;
+            }
+
+            const user = Auth.getCurrentUser();
+            const caseId = document.getElementById('doc-case').value || null;
+            const category = document.getElementById('doc-category').value;
+            const description = document.getElementById('doc-description').value.trim();
+
+            for (const file of selectedFiles) {
+                // Convert to base64 for localStorage storage
+                const base64 = await Utils.fileToBase64(file);
+
+                DataManager.addDocument({
+                    fileName: file.name,
+                    fileType: file.type,
+                    fileSize: file.size,
+                    fileData: base64,
+                    caseId: caseId,
+                    category: category,
+                    description: description,
+                    uploadedBy: user.id
+                });
+            }
+
+            Utils.showToast(`${selectedFiles.length} dokumen berhasil diupload`, 'success');
+
+            // Reset
+            selectedFiles = [];
+            document.getElementById('file-input').value = '';
+            document.getElementById('upload-preview').style.display = 'none';
+            document.getElementById('upload-form').style.display = 'none';
+            document.getElementById('doc-description').value = '';
+
+            renderDocuments();
+        }
+
+        function renderDocuments() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const caseFilter = document.getElementById('filter-case').value;
+            const categoryFilter = document.getElementById('filter-category').value;
+
+            let documents = DataManager.getDocuments();
+
+            if (search) {
+                documents = documents.filter(d =>
+                    d.fileName.toLowerCase().includes(search) ||
+                    (d.description && d.description.toLowerCase().includes(search))
+                );
+            }
+            if (caseFilter) {
+                documents = documents.filter(d => d.caseId === caseFilter);
+            }
+            if (categoryFilter) {
+                documents = documents.filter(d => d.category === categoryFilter);
+            }
+
+            // Sort by date
+            documents.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+
+            const grid = document.getElementById('documents-grid');
+
+            if (documents.length === 0) {
+                grid.innerHTML = `
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <div class="card-body text-center p-xl">
+                            <i class="fas fa-folder-open" style="font-size: 3rem; color: var(--gray-300); margin-bottom: 1rem;"></i>
+                            <h3 class="text-secondary">Tidak ada dokumen</h3>
+                            <p class="text-secondary">Upload dokumen pertama Anda</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = documents.map(doc => {
+                const ext = doc.fileName.split('.').pop().toLowerCase();
+                const typeConfig = fileTypeIcons[ext] || fileTypeIcons.default;
+                const catConfig = categoryConfig[doc.category] || categoryConfig.other;
+                const caseData = doc.caseId ? DataManager.getCaseById(doc.caseId) : null;
+                const uploader = DataManager.getUserById(doc.uploadedBy);
+
+                return `
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start gap-md mb-lg">
+                                <div class="file-icon" style="background: ${typeConfig.color};">
+                                    <i class="${typeConfig.icon}"></i>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <h4 class="truncate mb-xs" title="${doc.fileName}">${doc.fileName}</h4>
+                                    <div class="text-sm text-secondary">${Utils.formatFileSize(doc.fileSize)}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-lg">
+                                <span class="badge" style="background: ${catConfig.color}20; color: ${catConfig.color};">
+                                    <i class="${catConfig.icon} mr-sm"></i>${catConfig.label}
+                                </span>
+                            </div>
+                            
+                            ${caseData ? `
+                                <div class="text-sm mb-md">
+                                    <i class="fas fa-briefcase text-secondary mr-sm"></i>
+                                    <a href="case-detail.html?id=${caseData.id}">${caseData.caseNumber}</a>
+                                </div>
+                            ` : ''}
+                            
+                            ${doc.description ? `
+                                <p class="text-sm text-secondary mb-md line-clamp-2">${doc.description}</p>
+                            ` : ''}
+                            
+                            <div class="text-sm text-secondary mb-lg">
+                                <div class="mb-sm">
+                                    <i class="fas fa-user mr-sm"></i>${uploader?.fullName || 'Unknown'}
+                                </div>
+                                <div>
+                                    <i class="fas fa-clock mr-sm"></i>${Utils.formatDateTime(doc.uploadedAt)}
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-sm">
+                                <button class="btn btn-sm btn-primary" onclick="downloadDocument('${doc.id}')" style="flex: 1;">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                                <button class="icon-btn danger" onclick="deleteDocument('${doc.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function downloadDocument(id) {
+            const doc = DataManager.getDocuments().find(d => d.id === id);
+            if (!doc || !doc.fileData) {
+                Utils.showToast('File tidak ditemukan', 'error');
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.href = doc.fileData;
+            link.download = doc.fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            Utils.showToast('Download dimulai', 'success');
+        }
+
+        async function deleteDocument(id) {
+            const confirmed = await Utils.confirm('Apakah Anda yakin ingin menghapus dokumen ini?', 'Hapus Dokumen');
+            if (confirmed) {
+                DataManager.deleteDocument(id);
+                Utils.showToast('Dokumen berhasil dihapus', 'success');
+                renderDocuments();
+            }
+        }
+    </script>
+</body>
+
+</html>
